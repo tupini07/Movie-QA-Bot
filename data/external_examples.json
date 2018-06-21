@@ -1,0 +1,266 @@
+ [{
+         "text": "show me who played what role in harry potter",
+         "intent": "actor_name character",
+         "entities": [{
+             "start": 32,
+             "end": 44,
+             "value": "harry potter",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "show me who played what role in jumanji",
+         "intent": "actor_name character",
+         "entities": [{
+             "start": 32,
+             "end": 39,
+             "value": "jumanji",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "how many producers did the movie jumanji have",
+         "intent": "producer_count",
+         "entities": [{
+             "start": 33,
+             "end": 40,
+             "value": "jumanji",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "how many producers did eragon have",
+         "intent": "producer_count",
+         "entities": [{
+             "start": 23,
+             "end": 29,
+             "value": "eragon",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "list movies by director",
+         "intent": "director movie_name",
+         "entities": []
+     },
+     {
+         "text": "who made the matrix",
+         "intent": "director producer",
+         "entities": [{
+             "start": 9,
+             "end": 19,
+             "value": "the matrix",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "list movies by language",
+         "intent": "movie language",
+         "entities": []
+     },
+     {
+         "text": "show me movies listed by budget",
+         "intent": "movie budget",
+         "entities": []
+     },
+     {
+         "text": "who wrote the matrix",
+         "intent": "writer",
+         "entities": [{
+             "start": 10,
+             "end": 20,
+             "value": "the matrix",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "who wrote eragon",
+         "intent": "writer",
+         "entities": [{
+             "start": 10,
+             "end": 16,
+             "value": "eragon",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "show me movies sorted by rating, director and date",
+         "intent": "director movie date rating",
+         "entities": []
+     },
+     {
+         "text": "find rating information about the movie the matrix",
+         "intent": "rating rating",
+         "entities": [{
+             "start": 40,
+             "end": 50,
+             "value": "the matrix",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "show me jumanji reviews",
+         "intent": "review movie",
+         "entities": [{
+             "start": 8,
+             "end": 15,
+             "value": "jumanji",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "show me movies with a three star rating",
+         "intent": "movie",
+         "entities": [{
+             "start": 22,
+             "end": 27,
+             "value": "three",
+             "entity": "movie_star_rating"
+         }]
+     },
+     {
+         "text": "provide more info on movie the hitch",
+         "intent": "movie subjects",
+         "entities": [{
+             "start": 27,
+             "end": 36,
+             "value": "the hitch",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "show me videos of alfred hitchcock movies",
+         "intent": "movie media",
+         "entities": [{
+             "start": 18,
+             "end": 34,
+             "value": "alfred hitchcock",
+             "entity": "director_name"
+         }]
+     },
+     {
+         "text": "show me parental review for movie the matrix",
+         "intent": "review rating",
+         "entities": [{
+             "start": 34,
+             "end": 44,
+             "value": "the matrix",
+             "entity": "movie_name"
+         }]
+     },
+     {
+         "text": "show me pictures of producer albert ruddy",
+         "intent": "producer picture",
+         "entities": [{
+             "start": 29,
+             "end": 41,
+             "value": "albert ruddy",
+             "entity": "producer_name"
+         }]
+     },
+     {
+         "text": "how many awards did spielberg win for directing",
+         "intent": "award_count",
+         "entities": [{
+                 "start": 20,
+                 "end": 29,
+                 "value": "spielberg",
+                 "entity": "director_name"
+             },
+             {
+                 "start": 38,
+                 "end": 47,
+                 "value": "directing",
+                 "entity": "award_category"
+             }
+         ]
+     },
+     {
+         "text": "how many oscars has tom cruise won",
+         "intent": "award_category_count",
+         "entities": [{
+                 "start": 20,
+                 "end": 30,
+                 "value": "tom cruise",
+                 "entity": "person_name"
+             },
+             {
+                 "start": 9,
+                 "end": 15,
+                 "value": "oscars",
+                 "entity": "award_ceremony"
+             }
+         ]
+     },
+     {
+         "text": "hello",
+         "intent": "greet",
+         "entities": []
+     },
+     {
+         "text": "hi",
+         "intent": "greet",
+         "entities": []
+     },
+     {
+         "text": "hey",
+         "intent": "greet",
+         "entities": []
+     },
+     {
+         "text": "hello there",
+         "intent": "greet",
+         "entities": []
+     },
+     {
+         "text": "bye",
+         "intent": "goodbye",
+         "entities": []
+     },
+     {
+         "text": "goodbye",
+         "intent": "goodbye",
+         "entities": []
+     },
+     {
+         "text": "thanks",
+         "intent": "goodbye",
+         "entities": []
+     },
+     {
+         "text": "yes",
+         "intent": "affirm",
+         "entities": []
+     },
+     {
+         "text": "indeed",
+         "intent": "affirm",
+         "entities": []
+     },
+     {
+         "text": "correct",
+         "intent": "affirm",
+         "entities": []
+     },
+     {
+         "text": "no",
+         "intent": "deny",
+         "entities": []
+     },
+     {
+         "text": "nope",
+         "intent": "deny",
+         "entities": []
+     },
+     {
+         "text": "never",
+         "intent": "deny",
+         "entities": []
+     },
+     {
+         "text": "that is wrong",
+         "intent": "deny",
+         "entities": []
+     }
+
+ ]

@@ -1,0 +1,179 @@
+slots:
+  actor_name:
+    type: text
+  actor_nationality:
+    type: text
+  actor_type:
+    type: text
+  award_category:
+    type: text
+  award_ceremony:
+    type: text
+  character_name:
+    type: text
+  country_name:
+    type: text
+  director_name:
+    type: text
+  director_nationality:
+    type: text
+  movie_description:
+    type: text
+  movie_genre:
+    type: text
+  movie_gross_revenue:
+    type: text
+  movie_language:
+    type: text
+  movie_location:
+    type: text
+  movie_name:
+    type: text
+  movie_release_date:
+    type: text
+  movie_release_region:
+    type: text
+  movie_star_rating:
+    type: text
+  movie_subject:
+    type: text
+  person_name:
+    type: text
+  person_nationality:
+    type: text
+  producer_name:
+    type: text
+  rating_name:
+    type: text
+  matches:
+    type: unfeaturized
+
+
+entities:
+- actor_name
+- actor_nationality
+- actor_type
+- award_category
+- award_ceremony
+- character_name
+- country_name
+- director_name
+- director_nationality
+- movie_description
+- movie_genre
+- movie_gross_revenue
+- movie_language
+- movie_location
+- movie_name
+- movie_release_date
+- movie_release_region
+- movie_star_rating
+- movie_subject
+- person_name
+- person_nationality
+- producer_name
+- rating_name
+
+
+intents:
+ - actor
+ - actor_name
+ - actor_name character
+ - affirm
+ - award
+ - award_category_count
+ - award_ceremony award_category
+ - award_count
+ - birth_date
+ - budget
+ - character
+ - composer
+ - country
+ - deny
+ - director
+ - director movie date rating
+ - director movie rating
+ - director movie_name
+ - director producer
+ - director_name
+ - genre
+ - goodbye
+ - greet
+ - language
+ - media
+ - movie
+ - movie budget
+ - movie date
+ - movie director
+ - movie language
+ - movie media
+ - movie producer
+ - movie rating
+ - movie subjects
+ - movie trailer
+ - movie_count
+ - movie_name
+ - movie_other
+ - organization
+ - other
+ - person
+ - person_name
+ - picture
+ - producer
+ - producer picture
+ - producer_count
+ - rating
+ - rating rating
+ - release_date
+ - revenue
+ - review
+ - review movie
+ - review rating
+ - runtime
+ - subjects
+ - synopsis
+ - thankyou
+ - theater
+ - trailer
+ - writer
+
+ 
+
+templates:
+  utter_greet:
+    - "hey there!"
+    - "Hello"
+    - "Hi"
+  utter_goodbye:
+    - "Bye-bye"
+    - "Goodbye. Have a nice day!"
+  utter_default:
+    - "default message"
+  utter_ack_dosearch: 
+    - "ok let me see what I can find"
+  utter_ask_rephrase: 
+    - "I'm sorry, I didn't quite understand. Could you rephrase your question?"
+  utter_ask_howcanhelp:
+    - "how can I help you?"
+  utter_on_it: 
+    - "I'm on it"
+  utter_youarewelcome:
+    - "you're very welcome"
+
+
+actions:
+- utter_greet
+- utter_goodbye
+- utter_default
+- utter_ack_dosearch
+- utter_ask_rephrase
+- utter_ask_howcanhelp
+- utter_on_it
+- utter_youarewelcome
+
+- actions.ActionSearchPerson
+- actions.ActionSearchPersonInfo
+- actions.ActionSearchMovie
+- actions.ActionSearchMovieInfo
+
+- actions.ActionAnswer

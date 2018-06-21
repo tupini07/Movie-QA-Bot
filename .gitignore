@@ -1,0 +1,7 @@
+restaurantbot/
+models/
+*.log
+__pycache__
+.vscode
+DB explorer/
+~*
