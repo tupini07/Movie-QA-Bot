@@ -26,7 +26,7 @@ def train_dialogue(domain_file="movie_domain.yml",
                    training_data_file="data/stories.md"):
     agent = Agent(domain_file,
                   policies=[MemoizationPolicy(max_history=3),
-                            KerasPolicy(), MoviePolicy()])  # ScriptedPolicy()])
+                            KerasPolicy()])  # ScriptedPolicy()])
 
     training_data = agent.load_data(training_data_file)
     agent.train(
@@ -45,8 +45,9 @@ def train_online(domain_file="movie_domain.yml",
                  use_nlu_interpreter=False):
 
     agent = Agent(domain_file,
-                  policies=[MemoizationPolicy(max_history=2), KerasPolicy(), MoviePolicy()],
-                  interpreter=RasaNLUInterpreter("models/nlu/default/current") if use_nlu_interpreter else RegexInterpreter() )
+                  policies=[MemoizationPolicy(
+                      max_history=2), KerasPolicy(), MoviePolicy()],
+                  interpreter=RasaNLUInterpreter("models/nlu/default/current") if use_nlu_interpreter else RegexInterpreter())
 
     training_data = agent.load_data(training_data_file)
     agent.train_online(training_data,
@@ -69,8 +70,8 @@ def train_nlu(aggregated=False):
     from rasa_nlu import config
     from rasa_nlu.model import Trainer
 
-
-    training_data = load_data("data/"+ ("train_rasa" if not aggregated else "aggregated") + ".json")
+    training_data = load_data(
+        "data/" + ("train_rasa" if not aggregated else "aggregated") + ".json")
     trainer = Trainer(config.load("nlu_model_config.yml"))
     trainer.train(training_data)
     model_directory = trainer.persist('models/nlu/',
@@ -95,7 +96,8 @@ if __name__ == '__main__':
 
     parser.add_argument(
         'task',
-        choices=["train-nlu", "train-nlu-agg", "train-dialogue", "train-online-wnlu", "train-online", "run"],
+        choices=["train-nlu", "train-nlu-agg", "train-dialogue",
+                 "train-online-wnlu", "train-online", "run"],
         help="Specify what action you want the bot to make: train (in various ways) or run?")
     task = parser.parse_args().task
 
@@ -111,9 +113,9 @@ if __name__ == '__main__':
     elif task == "train-online-wnlu":
         train_online(use_nlu_interpreter=True)
 
-
     elif task == "run":
         run()
     else:
-        warnings.warn("The argument passed to the bot is not recognized. Please run this script with '-h' to see the supported actions.")
+        warnings.warn(
+            "The argument passed to the bot is not recognized. Please run this script with '-h' to see the supported actions.")
         exit(1)

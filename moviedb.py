@@ -42,7 +42,7 @@ def _build_basic_query_where(slots):
     return query
 
 
-def search_person(slots, column="*", extra_where=""):
+def make_search_on_slots(slots, column="*", extra_where=""):
     c = conn.cursor()
 
     basic_where = _build_basic_query_where(slots)
@@ -56,6 +56,5 @@ def search_person(slots, column="*", extra_where=""):
     data = cursor.fetchall()
 
     cursor.close()
-    conn.close()
 
     return data

@@ -18,7 +18,6 @@ class MoviePolicy(Policy):
         ]
 
         search_movie_info_intents = [
-            "picture",
             "movie_other",
             "language",
             "country",
@@ -49,6 +48,7 @@ class MoviePolicy(Policy):
             "synopsis",
             "theater",
             "trailer",
+            "picture",
         ]
 
         search_person_intents = [
@@ -118,5 +118,19 @@ class MoviePolicy(Policy):
         """
         This is just a 'scripted' policy, so there is really no need to train.
         This method is just a placeholder so that we can use this policy during online training.
+        """
+        pass
+
+    def persist(self, path):
+        """
+        The same as train. This is only a dummy method so that we can create our own
+        "scripted policy"
+        """
+        pass
+
+    @classmethod
+    def load(cls, path):
+        """
+        also this one is a placeholder method
         """
         pass

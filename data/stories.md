@@ -128,3 +128,39 @@
     - utter_goodbye
 
 
+## Generated Story -1294562172553945387
+* greet
+    - utter_greet
+    - utter_ask_howcanhelp
+* movie{"movie_language": "german"}
+    - slot{"movie_language": "german"}
+    - action_search_movie
+    - slot{"matches": "'Animals United', 'The Baader Meinhof Complex', 'The White Ribbon', 'Metropolis', 'Downfall', 'Das Boot', 'The Wave', 'Aimee & Jaguar', 'Good Bye Lenin!', 'Soul Kitchen', 'Cargo', 'Summer Storm', 'Anatomy', 'The Lives of Others', 'The Torture Chamber of Dr. Sadism', 'Run Lola Run', 'Pandora's Box', ' and '3'"}
+    - action_answer
+* director{"movie_language": "german"}
+    - slot{"movie_language": "german"}
+    - action_search_person
+    - slot{"matches": "'Max F\u00e4rberb\u00f6ck', 'Reinhard Klooss', 'Dennis Gansel', 'Marco Kreuzpaintner', 'Uli Edel', 'Georg Wilhelm Pabst', 'Fatih Akin', 'Oliver Hirschbiegel', 'Wolfgang Becker', 'Fritz Lang', 'Tom Tykwer', 'Michael Haneke', 'Harald Reinl', 'Florian Henckel von Donnersmarck', 'Wolfgang Petersen', 'Stefan Ruzowitzky', ' and 'Ivan Engler'"}
+    - action_answer
+* thankyou
+    - utter_youarewelcome
+* goodbye
+    - utter_goodbye
+
+
+
+## Generated Story -2456184888361863864
+* movie{"movie_release_date": "2012"}
+    - slot{"movie_release_date": "2012"}
+    - action_search_movie
+    - slot{"matches": "This are the movies I found: 'The Dark Knight Rises', and 'Shanghai Calling'"}
+    - action_answer
+* director
+    - action_search_person
+    - slot{"matches": "''Vladlen Barbe', 'Dean Wright', and 'Dominic Burns'"}
+    - action_answer
+* other
+    - utter_youarewelcome
+* goodbye
+    - utter_goodbye
+
