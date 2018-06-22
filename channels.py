@@ -38,17 +38,17 @@ class VoiceInputChannel(InputChannel):
         self.sender_id = sender_id
 
     def _record_messages(self, on_message, max_message_limit=None):
-        utils.print_color("Bot loaded with voice capabilities! Speak: ",
+        utils.print_color("Bot loaded with voice capabilities!",
                           utils.bcolors.OKGREEN)
         num_messages = 0
         while max_message_limit is None or num_messages < max_message_limit:
             try:
-                input("\nBot is ready! Press enter when you're ready to speak.")
                 with self.MICROPHONE as source:
                     self.SRECOGNIZER.adjust_for_ambient_noise(source)
-                    print("Ok, begin speaking: ")
+                    input("\nBot is ready! Press enter when you're ready to speak.")
                     audio = self.SRECOGNIZER.listen(source)
                 
+                print("Bot is recognizing what you said ...")
                 text = self.SRECOGNIZER.recognize_google(audio)
                 print("You said: " + text)
 
