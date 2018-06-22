@@ -14,6 +14,8 @@ from rasa_core.policies.memoization import MemoizationPolicy
 from rasa_core.policies.keras_policy import KerasPolicy
 from policy import MoviePolicy
 
+from channels import VoiceInputChannel, VoiceOutputChannel
+
 logger = logging.getLogger(__name__)
 
 logger.setLevel(logging.DEBUG)
@@ -79,12 +81,16 @@ def train_nlu(aggregated=False):
     return model_directory
 
 
-def run(serve_forever=True):
+def run(serve_forever=True, voice=False):
     interpreter = RasaNLUInterpreter("models/nlu/default/current")
     agent = Agent.load("models/dialogue", interpreter=interpreter)
 
     if serve_forever:
-        agent.handle_channel(ConsoleInputChannel())
+        if voice:
+            agent.handle_channel(VoiceInputChannel())
+        else:
+            agent.handle_channel(ConsoleInputChannel())
+
     return agent
 
 
@@ -97,7 +103,7 @@ if __name__ == '__main__':
     parser.add_argument(
         'task',
         choices=["train-nlu", "train-nlu-agg", "train-dialogue",
-                 "train-online-wnlu", "train-online", "run"],
+                 "train-online-wnlu", "train-online", "run", "run-voice"],
         help="Specify what action you want the bot to make: train (in various ways) or run?")
     task = parser.parse_args().task
 
@@ -113,6 +119,8 @@ if __name__ == '__main__':
     elif task == "train-online-wnlu":
         train_online(use_nlu_interpreter=True)
 
+    elif task == "run-voice":
+        run(voice=True)
     elif task == "run":
         run()
     else:

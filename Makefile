@@ -2,7 +2,8 @@ help:
 	@echo This is a utility to run multiple kinds of commands. 
 	@echo
 	@echo To run the bot use the following command:
-	@echo -e "\t run-bot"
+	@echo -e "\t run-bot" -- run bot on the command line:"
+	@echo -e "\t run-voice -- run bot over voice"
 	@echo
 
 	@echo -e  "Other availbale commands are: \n"
@@ -29,8 +30,12 @@ help:
 
 
 run-bot:
-	@echo --- Running bot
+	@echo --- Running bot on command line
 	@python bot.py run
+
+run-voice:
+	@echo --- Running bot with voice
+	@python bot.py run-voice
 
 
 convert-data:
