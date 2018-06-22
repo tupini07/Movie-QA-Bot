@@ -2,7 +2,7 @@ help:
 	@echo This is a utility to run multiple kinds of commands. 
 	@echo
 	@echo To run the bot use the following command:
-	@echo -e "\t run-bot" -- run bot on the command line:"
+	@echo -e "\t run-bot -- run bot on the command line"
 	@echo -e "\t run-voice -- run bot over voice"
 	@echo
 

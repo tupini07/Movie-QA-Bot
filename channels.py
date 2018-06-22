@@ -1,6 +1,8 @@
 
-import pyttsx3
 import six
+from builtins import input
+
+import pyttsx3
 import speech_recognition as sr
 from rasa_core import utils
 from rasa_core.channels.channel import InputChannel, OutputChannel, UserMessage
@@ -15,11 +17,14 @@ class VoiceOutputChannel(OutputChannel):
 
     def send_text_message(self, recipient_id, message):
         # type: (Text, Text) -> None
-        self.TTSENGINE.say(message)
-        self.TTSENGINE.runAndWait() 
-        utils.print_color("Bot is answering ... Following is a transcription of what it's saying: ", self.default_output_color)
-        utils.print_color(message, self.default_output_color)
 
+        what_to_say = message
+        if len(what_to_say) > 1000: # if we're going to say something very long then truncate it
+            what_to_say = "I found to much results to speak them, so I'll just print them to the console instead"
+
+        self.TTSENGINE.say(what_to_say)
+        self.TTSENGINE.runAndWait() 
+        print("Bot: " + message)
 
 
 class VoiceInputChannel(InputChannel):
@@ -37,11 +42,18 @@ class VoiceInputChannel(InputChannel):
                           utils.bcolors.OKGREEN)
         num_messages = 0
         while max_message_limit is None or num_messages < max_message_limit:
-
-            with self.MICROPHONE as source:
-                audio = self.SRECOGNIZER.listen(source)
+            try:
+                input("\nBot is ready! Press enter when you're ready to speak.")
+                with self.MICROPHONE as source:
+                    self.SRECOGNIZER.adjust_for_ambient_noise(source)
+                    print("Ok, begin speaking: ")
+                    audio = self.SRECOGNIZER.listen(source)
                 
-            text = self.SRECOGNIZER.recognize_google(audio)
+                text = self.SRECOGNIZER.recognize_google(audio)
+                print("You said: " + text)
+
+            except Exception:
+                text = input("Voice does not work :( input your query here: ").strip()
 
             if six.PY2:
                 # in python 2 input doesn't return unicode values
