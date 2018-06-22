@@ -5,6 +5,14 @@ import numpy as np
 
 
 class MoviePolicy(Policy):
+
+    def __init__(self,
+                 featurizer=None,  # type: Optional[TrackerFeaturizer]
+                 ):
+        # type: (...) -> None
+
+        super(MoviePolicy, self).__init__(featurizer)
+
     def predict_action_probabilities(self, tracker, domain):
         # These are the arrays of intents associated with each type of action
         search_movie_intents = [
@@ -18,11 +26,11 @@ class MoviePolicy(Policy):
         ]
 
         search_movie_info_intents = [
-            
+
             "language",
 
             "country",
-            
+
             "genre",
 
             "subjects",
@@ -34,8 +42,6 @@ class MoviePolicy(Policy):
             "release_date",
 
             "movie director",
-
-            "movie producer",
 
             "movie subjects",
 
@@ -49,20 +55,21 @@ class MoviePolicy(Policy):
             "producer",
             "producer picture",
             "producer_count",
-            
+            "movie producer",
+
             "movie rating",
             "rating",
             "rating rating",
             "review",
             "review movie",
             "review rating",
-            
+
             "revenue",
 
             "runtime",
 
             "synopsis",
-            
+
             "theater",
 
             "picture",
@@ -110,11 +117,14 @@ class MoviePolicy(Policy):
         action_ids = {k: v[0] for k, v in domain.action_map.items()}
 
         # the name of the current intent
-        key = tracker.latest_message.intent["name"]
+        last_intent = tracker.latest_message.intent["name"]
 
         # if previous action was "LISTEN" and the current intent is one of the intents we can handle
-        if tracker.latest_action_name == ACTION_LISTEN_NAME and key in intent_action_map.keys():
-            action = intent_action_map[key]
+        # and the previous action was not one of our custom actions (all start with action_)
+        if tracker.latest_action_name == ACTION_LISTEN_NAME and \
+                last_intent in intent_action_map.keys() and \
+                tracker.latest_action_name not in list(intent_action_map.values()) + ["action_fallout_slots"]:
+            action = intent_action_map[last_intent]
             id_action = action_ids[action]
             return utils.one_hot(id_action, domain.num_actions)
 
@@ -151,4 +161,4 @@ class MoviePolicy(Policy):
         """
         also this one is a placeholder method
         """
-        pass
+        return cls()

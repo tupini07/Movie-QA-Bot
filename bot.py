@@ -1,11 +1,7 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import argparse
 import logging
 import warnings
 
-from rasa_core import utils
 from rasa_core.agent import Agent
 from rasa_core.channels.console import ConsoleInputChannel
 from rasa_core.interpreter import RasaNLUInterpreter, RegexInterpreter
@@ -16,9 +12,6 @@ from policy import MoviePolicy
 
 from channels import VoiceInputChannel, VoiceOutputChannel
 
-logger = logging.getLogger(__name__)
-
-logger.setLevel(logging.DEBUG)
 
 warnings.filterwarnings(action='ignore', category=DeprecationWarning)
 
@@ -28,7 +21,8 @@ def train_dialogue(domain_file="movie_domain.yml",
                    training_data_file="data/stories.md"):
     agent = Agent(domain_file,
                   policies=[MemoizationPolicy(max_history=2),
-                            KerasPolicy()])  # ScriptedPolicy()])
+                            KerasPolicy(),
+                            MoviePolicy()])  # ScriptedPolicy()])
 
     training_data = agent.load_data(training_data_file)
     agent.train(
@@ -47,8 +41,9 @@ def train_online(domain_file="movie_domain.yml",
                  use_nlu_interpreter=False):
 
     agent = Agent(domain_file,
-                  policies=[MemoizationPolicy(
-                      max_history=2), KerasPolicy(), MoviePolicy()],
+                  policies=[MemoizationPolicy(max_history=2),
+                            KerasPolicy(),
+                            MoviePolicy()],
                   interpreter=RasaNLUInterpreter("models/nlu/default/current") if use_nlu_interpreter else RegexInterpreter())
 
     training_data = agent.load_data(training_data_file)
@@ -81,13 +76,14 @@ def train_nlu(aggregated=False):
     return model_directory
 
 
-def run(serve_forever=True, voice=False):
+def run(serve_forever=True, voice=False, voice_only_in_output=False):
     interpreter = RasaNLUInterpreter("models/nlu/default/current")
     agent = Agent.load("models/dialogue", interpreter=interpreter)
 
     if serve_forever:
         if voice:
-            agent.handle_channel(VoiceInputChannel())
+            agent.handle_channel(VoiceInputChannel(
+                prefer_text_input=voice_only_in_output))
         else:
             agent.handle_channel(ConsoleInputChannel())
 
@@ -95,15 +91,14 @@ def run(serve_forever=True, voice=False):
 
 
 if __name__ == '__main__':
-    utils.configure_colored_logging(loglevel="INFO")
-
     parser = argparse.ArgumentParser(
         description='Script that starts different functionalities of the bot.')
 
     parser.add_argument(
         'task',
         choices=["train-nlu", "train-nlu-agg", "train-dialogue",
-                 "train-online-wnlu", "train-online", "run", "run-voice"],
+                 "train-online-wnlu", "train-online",
+                 "run", "run-voice", "run-voice-only-output"],
         help="Specify what action you want the bot to make: train (in various ways) or run?")
     task = parser.parse_args().task
 
@@ -119,6 +114,8 @@ if __name__ == '__main__':
     elif task == "train-online-wnlu":
         train_online(use_nlu_interpreter=True)
 
+    elif task == "run-voice-only-output":
+        run(voice=True, voice_only_in_output=True)
     elif task == "run-voice":
         run(voice=True)
     elif task == "run":

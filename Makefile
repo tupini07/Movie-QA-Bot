@@ -4,6 +4,7 @@ help:
 	@echo To run the bot use the following command:
 	@echo -e "\t run-bot -- run bot on the command line"
 	@echo -e "\t run-voice -- run bot over voice"
+	@echo -e "\t run-voice-only-output -- run bot with normal text input but voice output"
 	@echo
 
 	@echo -e  "Other availbale commands are: \n"
@@ -37,6 +38,10 @@ run-voice:
 	@echo --- Running bot with voice
 	@python bot.py run-voice
 
+run-voice-only-output:
+	@echo --- Running bot with text input and voice output
+	@python bot.py run-voice-only-output
+	
 
 convert-data:
 	@echo --- Converting NLSPARQL data to rasa format and saving in data/ folder

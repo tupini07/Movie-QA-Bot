@@ -4,8 +4,10 @@ from rasa_core.actions import Action
 from rasa_core.domain import TemplateDomain
 from rasa_core.events import SlotSet
 from rasa_core.trackers import DialogueStateTracker
+from rasa_core.actions.action import ACTION_LISTEN_NAME
 
 import moviedb
+
 
 def extract_non_empty_slots(tracker: DialogueStateTracker):
     """
@@ -65,23 +67,34 @@ class ActionSearchPerson(Action):
         extra_slots = []
         if "director" in latest_intent:
             column = "director"
-            slots.pop("director_name", None) # if we're searching for a director then we won't use the name
+            # if we're searching for a director then we won't use the name
+            slots.pop("director_name", None)
+
+            # if we're asked for a director and we have a movie name in our slot then very probably
+            # we want to know the name of the director who directed "movie_name". So we can just go
+            # ahead and delete the others. Because of ActionFalloutSlots we know that movie_name
+            # has at most one turn of being in memory, so it's recent
+
+            # basically, just remove every other slot from the search
+            if "movie_name" in slots.keys():
+                for uneeded_slot in [k_s for k_s in slots.keys() if k_s != "movie_name"]:
+                    slots.pop(uneeded_slot, None)
 
         else:
             column = "actors"
-            slots.pop("actor_name", None) # if we're searching for an actor then we won't use its name
+            # if we're searching for an actor then we won't use its name
+            slots.pop("actor_name", None)
 
         # returns something of the shape [rows x columns]
         data = moviedb.make_search_on_slots(slots, column=column)
         data = [dr[0] for dr in data]  # extract the only value of each row
-    
 
         if column == "director":
             # just the name of the directors
             data = set(data)
             matches = _wrap_answer_commas_and(data)
 
-            if len(data) == 1: # if there is only one director then we save it the director slot
+            if len(data) == 1:  # if there is only one director then we save it the director slot
                 # in this way we can answer follow up questions regarding the director that the user may make
                 extra_slots.append(SlotSet("director_name", matches))
 
@@ -249,7 +262,7 @@ class ActionSearchMovieInfo(Action):
 
             ###########################################
             elif kws_in_latest_intent("producer", "picture", "organization", "other"):
-                matches = "I'm sorry but I don't have the information to answer your question. You can find information on the producer, organization, or other, in the movie's IMDB page: " + links
+                matches = "I'm sorry but I don't have the information to answer your question. You can find information on the producer, organization, or other, in the movie's IMDB page: \n" + links
 
             ###########################################
             elif kws_in_latest_intent("theater"):
@@ -269,7 +282,7 @@ class ActionAnswer(Action):
     def run(self, dispatcher, tracker, domain):
         matches = tracker.get_slot("matches")  # matches of last search
 
-        if matches == "" or matches is None: # we didn't find anything or there was an error
+        if matches == "" or matches is None:  # we didn't find anything or there was an error
             matches = "I'm sorry, I couldn't find anything that could answer your question"
 
         dispatcher.utter_message(matches)
@@ -277,7 +290,7 @@ class ActionAnswer(Action):
         tracker.trigger_follow_up_action(
             domain.action_map["action_fallout_slots"][1]
         )
-        
+
         return []
 
 
@@ -290,7 +303,7 @@ class ActionFalloutSlots(Action):
     """
     # this is the amount of life all new memories have (the extra amount of turns for which the bot will)
     # remember the slot
-    LIFETIME = 1 
+    LIFETIME = 1
 
     _memory = {
         # each entry will have the following shape
@@ -308,7 +321,8 @@ class ActionFalloutSlots(Action):
         """
         to_remove = []
 
-        current_items = cls._memory.copy().items() # we do this so we don't get a "dict changed during iteration" error 
+        # we do this so we don't get a "dict changed during iteration" error
+        current_items = cls._memory.copy().items()
         for k, vd in current_items:
             vd["life"] -= 1
             if vd["life"] <= 0:
@@ -316,7 +330,7 @@ class ActionFalloutSlots(Action):
                 cls._memory.pop(k, None)
 
         return to_remove
-    
+
     @classmethod
     def _update_memory_with_new(cls, new_entities):
         """
@@ -324,21 +338,26 @@ class ActionFalloutSlots(Action):
         it will inmediatelly be decreased in the next line)
         """
         for k, v in new_entities.items():
-            cls._memory[k] = {"value": v, "life": cls.LIFETIME + 1 }
-        
+            cls._memory[k] = {"value": v, "life": cls.LIFETIME + 1}
 
     def name(self):
         return "action_fallout_slots"
 
     def run(self, dispatcher, tracker: DialogueStateTracker, domain: TemplateDomain):
 
-        ents = {e["entity"]: e["value"] for e in tracker.latest_message.entities} 
+        ents = {e["entity"]: e["value"]
+                for e in tracker.latest_message.entities}
 
         # add new entities to memory
         ActionFalloutSlots._update_memory_with_new(ents)
 
         # "forgetting procedure"
         to_remove = ActionFalloutSlots._countdown_memory()
+
+        # this action is action_listen is  always followed by listen
+        tracker.trigger_follow_up_action( 
+            domain.action_map[ACTION_LISTEN_NAME][1]
+        )
 
         # clean slots
         return [SlotSet("matches", None)] + to_remove
