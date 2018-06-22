@@ -213,6 +213,11 @@
          "entities": []
      },
      {
+         "text": "hi bot",
+         "intent": "greet",
+         "entities": []
+     },
+     {
          "text": "bye",
          "intent": "goodbye",
          "entities": []
@@ -224,7 +229,12 @@
      },
      {
          "text": "thanks",
-         "intent": "goodbye",
+         "intent": "thankyou",
+         "entities": []
+     },
+     {
+         "text": "thank you",
+         "intent": "thankyou",
          "entities": []
      },
      {

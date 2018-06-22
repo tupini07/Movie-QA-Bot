@@ -18,37 +18,55 @@ class MoviePolicy(Policy):
         ]
 
         search_movie_info_intents = [
-            "movie_other",
+            
             "language",
+
             "country",
+            
             "genre",
+
+            "subjects",
+
             "budget",
             "movie budget",
+
             "movie date",
+            "release_date",
+
             "movie director",
-            "movie media",
+
             "movie producer",
-            "movie rating",
+
             "movie subjects",
+
             "movie trailer",
+            "trailer",
+            "movie media",
+
             "movie_count",
+
             "organization",
             "producer",
             "producer picture",
             "producer_count",
+            
+            "movie rating",
             "rating",
             "rating rating",
-            "release_date",
-            "revenue",
             "review",
             "review movie",
             "review rating",
+            
+            "revenue",
+
             "runtime",
-            "subjects",
+
             "synopsis",
+            
             "theater",
-            "trailer",
+
             "picture",
+            "movie_other",
         ]
 
         search_person_intents = [

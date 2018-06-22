@@ -141,12 +141,17 @@ intents:
 
 templates:
   utter_greet:
-    - "hey there!"
+    - "Hey there!"
     - "Hello"
     - "Hi"
+    - "Greetings"
+    - "Welcome!"
   utter_goodbye:
     - "Bye-bye"
     - "Goodbye. Have a nice day!"
+    - "Have a nice day"
+    - "Come back soon"
+    - "May the force be with you"
   utter_default:
     - "default message"
   utter_ack_dosearch: 
@@ -154,11 +159,14 @@ templates:
   utter_ask_rephrase: 
     - "I'm sorry, I didn't quite understand. Could you rephrase your question?"
   utter_ask_howcanhelp:
-    - "how can I help you?"
+    - "How may I help you?"
   utter_on_it: 
     - "I'm on it"
   utter_youarewelcome:
-    - "you're very welcome"
+    - "You're very welcome"
+    - "Any time ;)"
+    - "My pleasure!"
+    - "Happy to help :)"
 
 
 actions:
@@ -177,3 +185,5 @@ actions:
 - actions.ActionSearchMovieInfo
 
 - actions.ActionAnswer
+
+- actions.ActionFalloutSlots

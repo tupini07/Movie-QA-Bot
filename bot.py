@@ -25,7 +25,7 @@ def train_dialogue(domain_file="movie_domain.yml",
                    model_path="models/dialogue",
                    training_data_file="data/stories.md"):
     agent = Agent(domain_file,
-                  policies=[MemoizationPolicy(max_history=3),
+                  policies=[MemoizationPolicy(max_history=2),
                             KerasPolicy()])  # ScriptedPolicy()])
 
     training_data = agent.load_data(training_data_file)

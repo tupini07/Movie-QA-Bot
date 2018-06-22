@@ -35,14 +35,17 @@ def _build_basic_query_where(slots):
     # available slots
     av_slots = [x for x in slots.keys() if x in mappings.keys()]
 
-    for slt in av_slots:
-        query += f" where {mappings[slt]} like " + \
-            f"\"%{preprocess_slot_value(slots[slt])}%\" "
+    if len(av_slots) > 0:
+        for slt in av_slots:
+            query += f" {mappings[slt]} like " + \
+                f"\"%{preprocess_slot_value(slots[slt])}%\" and "
+
+        query = " where " + query[:-4]  # remove the last "and"
 
     return query
 
 
-def make_search_on_slots(slots, column="*", extra_where=""):
+def make_search_on_slots(slots, column="*", extra_where="", order_by="year"):
     c = conn.cursor()
 
     basic_where = _build_basic_query_where(slots)
@@ -50,10 +53,11 @@ def make_search_on_slots(slots, column="*", extra_where=""):
     if basic_where == "" and extra_where != "":
         basic_where = " where "
 
-    query = f"select {column} from movie {basic_where} {extra_where}"
+    query = f"select {column} from movie {basic_where} {extra_where} order by {order_by}"
     cursor = conn.execute(query)
 
-    data = cursor.fetchall()
+    data = [[str(itm).strip() if itm != "" else "I don't have this information in my database" for itm in row]
+                for row in cursor.fetchall()]
 
     cursor.close()
 
