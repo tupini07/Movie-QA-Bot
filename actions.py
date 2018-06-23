@@ -50,7 +50,8 @@ def _wrap_movie_title_answer(answrs, multiple_text="There are multiple answers t
         res += "".join(f"-> {r[0]}: {r[1]}\n" for r in answrs)
 
     elif len(answrs) == 1:
-        res = answrs[0][1]
+
+        res = ("\n" if answrs[0][1].startswith("http") else "") + answrs[0][1]
 
     return res
 
@@ -60,13 +61,16 @@ class ActionSearchPerson(Action):
         return 'action_search_person'
 
     def run(self, dispatcher, tracker: DialogueStateTracker, domain: TemplateDomain):
+        ActionFalloutSlots._last_custom_action = self.name()
 
         slots = extract_non_empty_slots(tracker)
         latest_intent = tracker.latest_message.intent["name"]
 
         extra_slots = []
         if "director" in latest_intent:
+
             column = "director"
+
             # if we're searching for a director then we won't use the name
             slots.pop("director_name", None)
 
@@ -76,7 +80,12 @@ class ActionSearchPerson(Action):
             # has at most one turn of being in memory, so it's recent
 
             # basically, just remove every other slot from the search
-            if "movie_name" in slots.keys():
+            # we can only suppose that this is the intent of the user if move_name was given in the
+            # last message or in the preious one (so, if provided in last message or in memory)
+            last_and_current_slots = [k["entity"] for k in tracker.latest_message.entities] + \
+                list(ActionFalloutSlots._memory.keys())
+
+            if "movie_name" in last_and_current_slots:
                 for uneeded_slot in [k_s for k_s in slots.keys() if k_s != "movie_name"]:
                     slots.pop(uneeded_slot, None)
 
@@ -117,6 +126,7 @@ class ActionSearchPersonInfo(Action):
         return 'action_search_person_info'
 
     def run(self, dispatcher, tracker: DialogueStateTracker, domain: TemplateDomain):
+        ActionFalloutSlots._last_custom_action = self.name()
 
         slots = extract_non_empty_slots(tracker)
 
@@ -138,6 +148,7 @@ class ActionSearchMovie(Action):
         return 'action_search_movie'
 
     def run(self, dispatcher, tracker: DialogueStateTracker, domain: TemplateDomain):
+        ActionFalloutSlots._last_custom_action = self.name()
 
         slots = extract_non_empty_slots(tracker)
 
@@ -163,6 +174,7 @@ class ActionSearchMovieInfo(Action):
         return 'action_search_movie_info'
 
     def run(self, dispatcher, tracker: DialogueStateTracker, domain: TemplateDomain):
+        ActionFalloutSlots._last_custom_action = self.name()
 
         intent_column_map = {
             "language": "language",
@@ -224,6 +236,7 @@ class ActionSearchMovieInfo(Action):
         # then we check for the different cases and handle them separately
 
         # if we're asked for the count of the movies in the series
+        
         elif kws_in_latest_intent("count"):
             data = moviedb.make_search_on_slots(slots, column="title")
             if len(data) > 0:
@@ -262,7 +275,7 @@ class ActionSearchMovieInfo(Action):
 
             ###########################################
             elif kws_in_latest_intent("producer", "picture", "organization", "other"):
-                matches = "I'm sorry but I don't have the information to answer your question. You can find information on the producer, organization, or other, in the movie's IMDB page: \n" + links
+                matches = "I'm sorry but I don't have the information to answer your question. You can find information on the producer, organization, or other, in the movie's IMDB page: " + links
 
             ###########################################
             elif kws_in_latest_intent("theater"):
@@ -280,13 +293,14 @@ class ActionAnswer(Action):
         return 'action_answer'
 
     def run(self, dispatcher, tracker, domain):
+
         matches = tracker.get_slot("matches")  # matches of last search
 
-        if matches == "" or matches is None:  # we didn't find anything or there was an error
+        if matches == " " or matches == "" or matches is None:  # we didn't find anything or there was an error
             matches = "I'm sorry, I couldn't find anything that could answer your question"
 
         dispatcher.utter_message(matches)
-
+                
         tracker.trigger_follow_up_action(
             domain.action_map["action_fallout_slots"][1]
         )
@@ -303,6 +317,8 @@ class ActionFalloutSlots(Action):
     """
     # this is the amount of life all new memories have (the extra amount of turns for which the bot will)
     # remember the slot
+    _last_custom_action = ""
+    
     LIFETIME = 1
 
     _memory = {
@@ -314,7 +330,7 @@ class ActionFalloutSlots(Action):
     }
 
     @classmethod
-    def _countdown_memory(cls):
+    def _countdown_memory(cls, tracker: DialogueStateTracker):
         """
         Decrease the "life" value of all memory units by one, and return a [ SlotSet() ]
         array to remove "dead" units from bot slots
@@ -325,9 +341,18 @@ class ActionFalloutSlots(Action):
         current_items = cls._memory.copy().items()
         for k, vd in current_items:
             vd["life"] -= 1
+
             if vd["life"] <= 0:
-                to_remove.append(SlotSet(k, None))
-                cls._memory.pop(k, None)
+                # if last action was to answer some movie information and we have the movie
+                # name then it is possible that the user will still want to talk about the movie.
+                # so we extend movie_name entity life by one more turn
+                if cls._last_custom_action == "action_search_movie_info" and \
+                        k == "movie_name":
+                    vd["life"] += 1
+
+                else:
+                    to_remove.append(SlotSet(k, None))
+                    cls._memory.pop(k, None)
 
         return to_remove
 
@@ -344,6 +369,7 @@ class ActionFalloutSlots(Action):
         return "action_fallout_slots"
 
     def run(self, dispatcher, tracker: DialogueStateTracker, domain: TemplateDomain):
+        import ipdb; ipdb.set_trace()
 
         ents = {e["entity"]: e["value"]
                 for e in tracker.latest_message.entities}
@@ -352,10 +378,17 @@ class ActionFalloutSlots(Action):
         ActionFalloutSlots._update_memory_with_new(ents)
 
         # "forgetting procedure"
-        to_remove = ActionFalloutSlots._countdown_memory()
+        to_remove = ActionFalloutSlots._countdown_memory(tracker)
 
-        # this action is action_listen is  always followed by listen
-        tracker.trigger_follow_up_action( 
+        # for debugging
+        # print("-- last action: " + str(tracker.latest_action_name))
+        # print("-- memory: " + str(ActionFalloutSlots._memory))
+        # print("-- intent: " + str(tracker.latest_message.intent["name"]))
+        # print("-- stuff to pop: " + str(to_remove))
+        # print("-- what slots we have: " + str(extract_non_empty_slots(tracker)))
+
+        # this action is always followed by listen
+        tracker.trigger_follow_up_action(
             domain.action_map[ACTION_LISTEN_NAME][1]
         )
 
