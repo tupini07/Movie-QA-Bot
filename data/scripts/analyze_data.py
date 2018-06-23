@@ -2,10 +2,6 @@
 For the moment, extract entities, extract intents (from train data only)
 """
 
-# TODO
-# https://github.com/brmson/dataset-factoid-movies/blob/master/moviesF/train.json
-# https://github.com/Uberi/speech_recognition
-
 import json
 from pprint import pprint
 
