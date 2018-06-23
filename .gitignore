@@ -33,3 +33,7 @@ report/*.mtc
 report/*.mtc1
 report/*.out
 report/*.synctex.gz
+report/__*
+report/*.fdb_latexmk
+report/*.fls
+report/*(busy)

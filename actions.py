@@ -369,7 +369,6 @@ class ActionFalloutSlots(Action):
         return "action_fallout_slots"
 
     def run(self, dispatcher, tracker: DialogueStateTracker, domain: TemplateDomain):
-        import ipdb; ipdb.set_trace()
 
         ents = {e["entity"]: e["value"]
                 for e in tracker.latest_message.entities}

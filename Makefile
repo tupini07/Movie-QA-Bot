@@ -12,7 +12,7 @@ help:
 	@echo -e "Training: "
 	@echo -e "\t train-nlu -- train nlu module"
 	@echo -e "\t train-nlu-aggregated -- train nlu module on aggregation of train and test data"
-	@echo -e "\t train-dialogue -- train dialogue part"
+	@echo -e "\t train-dialogue -- train dialogue module"
 	@echo -e "\t train-online -- start bot in interactive training mode"
 	@echo -e "\t train-online-with-nlu -- start bot in interactive training mode using the NLU interpreter"
 	@echo
