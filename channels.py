@@ -1,8 +1,9 @@
 
-import six
+import textwrap
 from builtins import input
 
 import pyttsx3
+import six
 import speech_recognition as sr
 from rasa_core import utils
 from rasa_core.channels.channel import InputChannel, OutputChannel, UserMessage
@@ -41,14 +42,19 @@ class VoiceInputChannel(InputChannel):
             self.MICROPHONE = sr.Microphone()
 
     def _record_messages(self, on_message, max_message_limit=None):
-        utils.print_color("Bot loaded with voice capabilities! \n" +
-                          "Note that in this mode the bot will do the following things: \n" +
-                          "- When the answer it's too long (more than 250 characters) the bot will " +
-                          "just say that it found an answer and then print the real answer to the console "+
-                          "this is done because 'speaking' a long answer can take a lot of time \n" +
-                          "- When multiple answers to a question are found then the bot will only say that it found multiple " + 
-                          "answers and it will print each answer to the console. This is also done to save time (besides, " +
-                          "listening to multiple answers can be confusing)" ,
+        utils.print_color(textwrap.dedent("""
+                        Bot loaded with voice capabilities!
+
+                        Note that in this mode the bot will do the following things:
+
+                        - When the answer it's too long (more than 250 characters) the bot will 
+                          just say that it found an answer and then print the real answer to the 
+                          console this is done because 'speaking' a long answer can take a lot of time 
+
+                        - When multiple answers to a question are found then the bot will only say 
+                          that it found multiple answers and it will print each answer to the console. 
+                          This is also done to save time (besides, listening to multiple answers can be confusing)
+                          """) ,
                           utils.bcolors.OKGREEN)
         num_messages = 0
         while max_message_limit is None or num_messages < max_message_limit:

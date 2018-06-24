@@ -10,8 +10,15 @@ from rasa_core.policies.memoization import MemoizationPolicy
 from rasa_core.policies.keras_policy import KerasPolicy
 from policy import MoviePolicy
 
-from channels import VoiceInputChannel, VoiceOutputChannel
-
+try:
+    from channels import VoiceInputChannel
+except ImportError as e:
+    import traceback
+    traceback.print_exc()
+    print("It seems that there are some issues when loading the voice module. Error: ")
+    print("Execution will proceed but defaulting to text input/output instead of voice")
+    def VoiceInputChannel (**kw):
+        return ConsoleInputChannel()
 
 warnings.filterwarnings(action='ignore', category=DeprecationWarning)
 
@@ -65,7 +72,7 @@ def train_nlu(aggregated=False):
     """
     from rasa_nlu.training_data import load_data
     from rasa_nlu import config
-    from rasa_nlu.model import Trainer
+    from rasa_nlu.model import Trainer 
 
     training_data = load_data(
         "data/" + ("train_rasa" if not aggregated else "aggregated") + ".json")

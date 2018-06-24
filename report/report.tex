@@ -37,7 +37,7 @@
 
 \newcommand\BibTeX{B{\sc ib}\TeX}
 
-\title{Movise Domain Bot \\ Final project}
+\title{Movie Domain Bot \\ Final project}
 
 \author{Andrea Tupini \\
   MAT.  194578 \\
@@ -71,13 +71,13 @@
 		Originally, the provided NLU data consisted of the following files: 
 		
 		\begin{description}
-			\item[NLSPARQL.test] words and IOB tags for testing
-			\item[NLSPARQL.train] words and IOB tags for training
+			\item[NLSPARQL.test] words and IOB tags for testing (contains 1120 examples)
+			\item[NLSPARQL.train] words and IOB tags for training (contains 3374 examples)
 			\item[NLSPARQL.test.utt.labels] contains labels on what each question in the test set is about              
 			\item[NLSPARQL.train.utt.labels] labels on questions of training set
 		\end{description}
 	
-		The NLSPARQL format is not recognized by Rasa, so these had to be converted to a properly formatted \textit{json} file. In the rasa format, for each sentence we need to provide which are the entities and intent of the sentence (entities and intents are defined in section \ref{ssec-nlu-module}). Extracting entities was just a simple matter of using the IOB tags that are not \textit{O}s, and the intents were taken directly from the \textit{labels} files.
+		The NLSPARQL format is not recognized by Rasa, so these had to be converted to a properly formatted \textit{json} file. In the rasa format, for each sentence we need to provide which are the entities and intent of the sentence (entities and intents are defined in section \ref{ssec-nlu-module}). Extracting entities was just a simple matter of using the IOB tags that are not \textit{O}s, and the intents were taken directly from the \textit{labels} files. In the dataset there are \textbf{24} different entity labels and \textbf{67} different intent labels.
 		
 		Here we have a graphic that shows the count of different entity types provided in the dataset (note that it is log scaled so as to account for the difference between the most common entity and the least common one):
 		
@@ -125,49 +125,220 @@
 \section{Bot Modules}
 \label{sec-bot-modules}
 
-\subsection{NLU Module}
-\label{ssec-nlu-module}
+	The bot is composed of 2 main modules: the \textbf{NLU Module} and the \textbf{Dialogue Module}. These have quite different functionalities but work in conjunction to make the bot work correctly. Below is a brief explanation of each and their components.
 
-taslk about entities
-
-\subsubsection{Rasa NLU}
-\label{ssec-rasa-nlu}
+	\subsection{NLU Module}
+	\label{ssec-nlu-module}
 	
-	remember to talk about pipeline
+		The NLU module is in charge of recognizing what are the \textit{intents} and \textit{entities} in a sentence. It can be thought of as the module that is in charge of translating what the user wants so that the bot's core functionality can understand it. 
+		
+		But before we can start talking about the NLU module we need to make some definitions:
+		
+		\begin{description}
+			\item[entities] entities are the pieces of text in a sentence that the NLU module identifies as \textit{relevant} and to which it assigns a name (ie, \textit{comedy} is labeld with the entity \textit{movie genre}). These are what we want the NLU module to extract from a sentence.
+			\item[intents] the intents are "\textit{the meaning behind a sentence}". They're the kind of things we expect the user to say and which we can handle (ie, \textit{show me comedy movies} has the intent of \textit{show movies}). 
+		\end{description}
+	
+		The bot uses the knowledge on \textit{entities} and \textit{intents} provided by the NLU module to decide what to do next and how to do it.
+		
+		\subsubsection{Rasa NLU}
+		\label{ssec-rasa-nlu}
+			
+			To create the NLU module, the \textbf{Rasa NLU} \cite{rasanlu} library was used. It provides most of the functionality out of the box, what we need to do is choose a \textit{pipeline} and provide it with the training examples so that it can train the models.
+			
+			The core idea behind Rasa NLU is that of a pipeline. The pipeline is composed of different components, and when a new message is given to the NLU module, it passes through each component of the pipeline in a sequential manner. The components in the pipeline are each in charge of doing different different things. For this bot, the \textit{spacy\_sklearn} "standard" pipeline is  used, which is one that is already defined in the library itself. 
+			
+			According to \cite{rasanichol} the components (in the order of processing) of the \textit{spacy\_sklearn} pipeline are:
+			
+			\begin{description}
+				\item[1. nlp\_spacy] 
+				this component is in charge of initializing Spacy structures. It is the first component in the pipeline since all other components depend on it. 
+				
+				\item[2. tokenizer\_spacy] 
+				creates "tokens" from the words in the sentence by using Spacy. It basically consists of segmenting the sentence into words, symbols and punctuations. More information on Spacy's functionality, including the tokenization process, can be found in \cite{spacy-tokenization}.
+				
+				\item[3. intent\_entity\_featurizer\_regex] 
+				creates regex features by looking at the training data that will support \textit{entity} and \textit{intent} classification. These features will later be used by the \textit{ner\_crf} component for extraction.
+				
+				\item[4. intent\_featurizer\_spacy] 
+				creates features for intent classification using the spacy featurizer. It basically adds the spacy word vectors to the other text features.
+				
+				\item[5. ner\_crf] 
+				uses conditional random fields to extract entities. This component makes use of features created in previous components and also creates some of its own features, mainly: POS tags, capitalization, and it also considers word ordering. The most likely set of tags is calculated and returned.
+				
+				\item[6. ner\_synonyms] 	
+				Maps synonymous entity values to the same value. 
+				
+				\item[7. intent\_classifier\_sklearn] 
+				employs a linear SVM that uses features extracted in previous components so as to define what is the \textit{intent} of a sentence. It returns the intent label it is most confident on and also the other labels that "\textit{did not win}".
+				
+			\end{description}
+			
+			Some of these components, like the \textit{entity} and \textit{intent} extractor, need to be trained so they can do their job correctly. This is done in the \textit{training phase}, in which we provide the NLU module with data and it automatically trains each component of the pipeline based on it.
 
-\subsection{Dialogue Module}
-\label{ssec-dialogue-module}
 
-\subsubsection{Rasa Core}
-\label{ssec-rasa-core}	
+	\subsection{Dialogue Module}
+	\label{ssec-dialogue-module}
+		
+		The dialog module is the second main part of the bot, and can really be thought of as the logic behind the bot's actions. As said above, the NLU is in charge of translating what the user means into data that the bot can understand. The \textit{Dialogue Module} is the part that does this \textit{understanding}.
+		
+		\subsubsection{Rasa Core}
+		\label{ssec-rasa-core}	
+		
+			To build the dialogue module, the \textbf{Rasa Core} \cite{rasacore} library was used. This provides lots of built in functionality, we only need to specify what is needed for the bot to work as we want it to. Rasa Core will take charge of integrating itself with the NLU module, remembering entities, training the dialogue policies (more on this later), and basically setting up a framework around which to build the bot's logic. 
+			
+			The main configuration file of the dialogue module is the \textit{domain file}, in this we specify the following information:
+			
+			\begin{description}
+				\item[slots] these can be thought of as the "entities" we want the bot to "remember" when they're detected in a sentence.
+				\item[entities] these are a list of all the entities we expect the NLU module to recognize.
+				\item[intents] these are all the intents we expect the NLU module to recognize.
+				\item[templates] these are simple, canned, phrases that our bot may utter as a response to a user's query.
+				\item[actions] a list of all the actions our bot is capable of doing. These may contain simple actions like uttering one of the \textit{templates} or custom actions.
+			\end{description}
+			
+			In the dialogue module we also define how the user interacts with the bot, specifically what are the \textit{channels of communication}. For our bot, the user can interact with it either via text (like a normal chat) or via voice. The implementation of the voice communication channel is discussed more in depth in section \ref{sec-speech}.
+			
+			Besides the domain file and the channel configuration, the dialogue module is also optionally composed of one or more \textit{Policies} and one or more \textit{Custom Actions}. For this bot we've defined one custom policy and some custom actions. More on them in the sections below.
 
-	remember to talk about domain
+		\subsubsection{Custom Actions}
+		\label{ssec-custom-actions}	
+			
+			This bot makes use of some custom actions, specifically actions that handle answering questions on the movie domain. The list of custom actions and a brief definition is the following:
+			
+			\begin{description}
+				\item[ActionSearchPerson] 
+				is in charge of searching for a person or persons (so, director/actor)
+				
+				\item[ActionSearchPersonInfo] 
+				searches for information on a person, or gives the IMDB page of the person if no information is found in the database.
+				
+				\item[ActionSearchMovie] 
+				searches for a movie given some criteria
+				
+				\item[ActionSearchMovieInfo] 
+				searches for information on a movie(s) given some criteria
+				
+				\item[ActionAnswer] 
+				shows answer of search to the user
+				
+				\item[ActionFalloutSlots] 
+				implements a \textit{short term memory}. More on this in section \ref{ssec-forgetting}.
+				
+				
+			\end{description}
+			
+			The action that gets executed at each turn is selected by the policy depending on what is the intent of the user in its last utterance. 
 
-\subsubsection{Policies}
-\label{ssec-policies}	
-
-\subsubsection{Custom Actions}
-\label{ssec-custom-actions}	
-
-\subsubsection{Forgetting}
-\label{ssec-forgetting}	
-
-Not stremlined/goal otiented task.
-
+		\subsubsection{Policies}
+		\label{ssec-policies}	
+			
+			The policies used in a bot are one of the most important parts. They are what says, given a user input already \textit{translated} by the NLU module, which action of the bot should be done next so as to handle the user's utterance in the best way possible. In a high level view, policies receive a user utterance from the NLU module and return one probability for each possible action, which says how likely is it that the bot will execute said action next.
+			
+			For this bot, a conjunction or Rasa's own \textit{MemoizationPolicy} and \textit{KerasPolicy} together with a custom policy was used. Both the meimoization and keras policies are trained on a dataset of example conversations, in this way they learn to predict which is the action that should be done next. Both of these are used to handle "non-custom" actions (like greet, say goodbye, etc), while the custom policy is in charge of routing requests that need special treatment to the respective actions. More information on the Keras and Memoization policies can be found in \cite{rasacore}.
+			
+			The custom policy takes in a request and the intent that the NLU module has assigned to it. If the intent is one that can be handled by one of the custom actions (ie, search for a movie, or information on a movie) then the corresponding action is selected as the one to be executed next. If the intent of the current request is not one that can be handled by the actions then this policy doesn't apport anything and lets the \textit{MemoizationPolicy} and \textit{KerasPolicy} choose what should be the next action.
+		
+		
+		\subsubsection{Forgetting}
+		\label{ssec-forgetting}	
+		
+			This bot has a special action that doesn't really interact with the user, but is in charge of giving a \textit{short term memory} to the bot. As said before, the dialogue module has some \textit{slots} that are in charge of \textit{remembering} the respective entities when encountered in a user's utterance. Once they're encountered they're remembered until the end of the conversation. 
+			
+			This mechanism may work fine for streamlined, or short term goal oriented bots, where they have a clear goal (ie, make a restaurant reservation), where they need to get some information  to accomplish it (ie, the kind of restaurant). The actions of getting this information to accomplish the end goal are the \textit{short term goals}, and the bot can simply switch from one to the other until it has all the information and can accomplish the end goal (ie, make the reservation). 
+			
+			However, our movie QA bot does not really live in a \textit{streamlined} environment. The strategy of remembering forever may work fine for short conversation with only one context (if the user only asks questions about one thing), but when it comes to longer conversations, or conversations with multiple unrelated contexts, then the bot will just end up with too much information in it's memory (the slots) and won't be able to determine which of the information is actually relevant to the conversation and which isn't.
+			
+			The method used for this bot to counter this problem is that of replacing the \textit{persistent memory} with a \textit{short term one} in which slots have a lifetime and at each turn this lifetime is decreased by one, when the lifetime reaches 0 the slot is cleaned (the information it holds is deleted). If a users mentions information on an already existing slot then the lifetime of that slot is reset. Currently each slot has a lifetime of 1 turn, meaning that it will be deleted at the end of the next turn (it may be used by the current and next turn's actions) if the slot is not \textit{renewed} by the user. The only exception is the slot that holds the \textit{movie name}, this is renewed if either the user mentions it explicitly or if a \textit{serch movie info} action is executed. 
+			
+			Note that the lifetime only gets reduced if the last executed action is one of our custom actions, so that if the bot does another action (like greeting) or just doesn't understand what the users meant then the slot information is preserved for one extra turn. This ensures that the slot won't be cleaned prematurely.
+			
+			The lifetime ensures that the slots remains relevant for the current context. Once there is a context change and a slot is no longer relevant it gets cleaned. This is good because it helps the bot keep up with longer conversations. However, there is still the limitation that when the user is talking about something and then immediately asks something unrelated, the bot won't be able to notice the context change (although this also happens with the defualt, persistent memory approach). This context change problem happens unless new context is on the same topic of the last one, meaning that the relevant slot will be updated with the new information.
+			
+		\subsubsection{Speech Channels}
+		\label{sec-speech}
+		
+			The speech functionality was implemented by adding \textit{custom input and output channels} to the dialogue module. The used channels are basically variations of Rasa's default text I/O channels. 
+			
+			For the voice output channel, instead of only outputting the response to the console it is also given to a TTS service so that it will be spoken to the user. 
+			
+			The input channel is slightly harder since we need to know when to start \textit{listening} for user utterances and then we need to convert them to text. A basic interaction via the console was set up in which the user can specify he/she is ready to speak by pressing a key in the keyboard. After the users says its request, the audio is sent to an external speech recognition service, which then returns the text present in the audio. This text is then processed as a normal text input by the bot.
+			
+			
 \section{Evaluation}
 \label{sec-evaluation}
 
-	ev
+	Here we evaluate the NLU module's performance when extracting \textit{entities} an \textit{intents}. It is not possible to actually evaluate the dialogue module since we're using a \textit{scripted policy} which works by routing certain intents to certain actions. This policy is fixed and non-trainable, so it makes no sense in evaluating the performance (since it will always choose the expected action). 
+	
+	Remember that as we said in section \ref{ssec-rasa-nlu}, the NLU pipeline components in charge of extracting entities and intents are the \textit{ner\_crf} (using conditional random fields) and \textit{intent\_classifier\_sklearn} (using a linear SVM).
+	
+	Below are the result of evaluating the NLU module on a test set:
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{l|l|l}
+			\textbf{Metric} & \textbf{Intent} & \textbf{Entity} \\ 
+			\hline 
+			F1-Score & 0.716 & 0.922 \\ 
+			\hline 
+			Precision & 0.707 & 0.921 \\ 
+			\hline 
+			Accuracy & 0.754 & 0.926\\ 
+			\hline 
+		\end{tabular} 
+		\caption{NLU performance: \textit{intent} and \textit{entity} classification on test set}
+		\label{table:1}
+	\end{table}
+		
+	In table \ref{table:1} we can see that the performance of classifying entities is much better than that of classifying intents. This makes sense since there are much less entity than intent labels (24 and 67 respectively).
+	
+	Below are the results of evaluating the NLU module via \textit{cross validation} on the whole dataset (training + test data). \textbf{5} folds were used to do the cross validation.
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{l|l|l}
+			\textbf{Metric} & \textbf{Train} & \textbf{Test} \\ 
+			\hline 
+			F1-Score & 0.930 & 0.765 \\ 
+			\hline 
+			Precision & 0.934 & 0.760\\ 
+			\hline 
+			Accuracy & 0.941 & 0.790 \\ 
+			\hline 
+		\end{tabular} 
+		\caption{NLU performance: \textit{intent} classification cross validation}
+		\label{table:2}
+	\end{table}	
+	
+	We can see in table \ref{table:2} that the classification of training examples is quite good, and that of test examples is a bit better than it was when evaluating only on the test set. 
+	
+	Below is another table with the resulting performance of classifying entities via cross validation:
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{l|l|l}
+			\textbf{Metric} & \textbf{Train} & \textbf{Test} \\ 
+			\hline 
+			F1-Score & 0.962 & 0.930 \\ 
+			\hline 
+			Precision & 0.962 & 0.931 \\ 
+			\hline 
+			Accuracy & 0.964 & 0.934 \\ 
+			\hline 
+		\end{tabular} 
+		\caption{NLU performance: \textit{entity} classification cross validation}
+		\label{table:3}
+	\end{table}	
 
-\section{Speech}
-\label{sec-speech}
-
+	As expected, we see in table \ref{table:3} that both the performances when classifying training and testing examples are quite good. 
 	
 
 \section{Difficulties}
 \label{sec-difficulties}
 
-	fw.
+	When to know when a user is changing contenxt
+	when do we ask for clarification
+	Text to speech
 
 \section{Possible Improvements}
 
@@ -176,9 +347,12 @@ Not stremlined/goal otiented task.
 \section{Conclusion}
 \label{sec-conclusion}
 	
-	remember to add references to tools' sites
 	
-
+	
+\section{Appendix}
+\label{sec-appendix}
+	
+	try to put image of crossvalidation of NLU intent classification, if done remember to add refernece to evalluation section
 
 % include your own bib file like this:
 \bibliographystyle{plain}

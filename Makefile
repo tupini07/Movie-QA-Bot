@@ -87,7 +87,7 @@ train-online-with-nlu:
 
 evaluate-nlu: train-nlu
 	@echo --- Evaluating NLU
-	@python -m rasa_nlu.evaluate -d data/test_rasa.json -m models/nlu/default/current/
+	@python evaluate_nlu.py -d data/test_rasa.json -m models/nlu/default/current/
 
 evaluate-nlu-crossval: convert-data
 	@echo --- Evaluating NLU with crossvalidation
@@ -101,6 +101,6 @@ evaluate-nlu-crossval: convert-data
 
 evaluate-dialogue: train-dialogue
 	@echo --- Evaluating Dialogue
-	@python -m rasa_core.evaluate -s data/test_st.md -d models/dialogue/ -v
+	@python -m rasa_core.evaluate -s data/stories.md -d models/dialogue/ -v
 
 

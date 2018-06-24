@@ -109,18 +109,21 @@ def extract_tags(sentence: List[List[str]]) -> List[Dict[str, str]]:
 
 sent_dicts = []
 for idx, sentence in enumerate(contents):
+    
     s_text = extract_text(sentence)
     s_tags = extract_tags(sentence)
 
     entities = []
     for tag in s_tags:
 
-        match = re.search(tag["text"], s_text)
+        # so as to ensure that we find the complete tag we search for the word
+        # wrapped with spaces. 
+        match = re.search(" " + tag["text"] + " ", " " + s_text + " ")
         entities.append({
             "value": tag["text"],
             "entity": tag["tag"],
             "start": match.start(),
-            "end": match.end(),
+            "end": match.end() - 2, # no need to adjust match.start, but we do need to adjust match.end
 
         })
 

@@ -1,0 +1,134 @@
+Intent classification:
+2018-06-23 18:53:42 INFO     __main__  - F1-Score:  0.7161226957969732
+2018-06-23 18:53:42 INFO     __main__  - Precision: 0.7073705437504614
+2018-06-23 18:53:42 INFO     __main__  - Accuracy:  0.7544642857142857
+2018-06-23 18:53:42 INFO     __main__  - Classification report:
+                            precision    recall  f1-score   support
+
+                     actor       0.71      0.75      0.73        52
+                actor_name       1.00      0.44      0.62         9
+      actor_name character       0.00      0.00      0.00         3
+                    affirm       0.00      0.00      0.00         3
+      award_category_count       0.00      0.00      0.00         1
+               award_count       0.00      0.00      0.00         1
+                birth_date       0.00      0.00      0.00         2
+                    budget       0.88      0.92      0.90        38
+                   company       0.00      0.00      0.00         1
+                   country       0.79      0.88      0.83        17
+                      deny       0.50      0.25      0.33         4
+               description       0.00      0.00      0.00         1
+                  director       0.82      0.75      0.79        56
+director movie date rating       0.00      0.00      0.00         1
+       director movie_name       0.00      0.00      0.00         1
+         director producer       0.00      0.00      0.00         1
+             director_name       1.00      0.40      0.57         5
+                     genre       0.93      0.68      0.79        19
+                   goodbye       1.00      1.00      1.00         2
+                     greet       0.83      1.00      0.91         5
+                  language       0.85      0.79      0.81        14
+                     media       0.00      0.00      0.00         2
+                     movie       0.77      0.95      0.85       510
+               movie actor       0.00      0.00      0.00         3
+          movie actor_name       0.00      0.00      0.00         1
+              movie budget       0.00      0.00      0.00         1
+            movie director       0.00      0.00      0.00         4
+               movie genre       0.00      0.00      0.00         1
+            movie language       0.00      0.00      0.00         1
+               movie media       0.00      0.00      0.00         1
+            movie producer       0.00      0.00      0.00         4
+              movie rating       0.00      0.00      0.00         0
+        movie release_date       0.00      0.00      0.00         1
+              movie review       0.00      0.00      0.00         2
+            movie subjects       0.00      0.00      0.00         1
+               movie_count       0.75      0.90      0.82        10
+                movie_name       0.50      0.29      0.36         7
+               movie_other       0.39      0.11      0.17        80
+              organization       0.00      0.00      0.00         5
+                     other       0.18      0.30      0.23        23
+                    person       0.69      0.69      0.69        26
+               person_name       0.00      0.00      0.00         1
+                   picture       0.00      0.00      0.00         5
+                  producer       0.73      0.79      0.76        47
+          producer picture       0.00      0.00      0.00         1
+            producer_count       1.00      0.50      0.67         2
+                    rating       0.71      0.63      0.67        19
+             rating rating       0.00      0.00      0.00         1
+              release_date       0.87      0.93      0.90        56
+                   revenue       0.94      0.80      0.87        41
+                    review       1.00      0.80      0.89        10
+              review movie       0.00      0.00      0.00         1
+             review rating       0.00      0.00      0.00         1
+                   runtime       1.00      1.00      1.00         1
+                  subjects       0.00      0.00      0.00         2
+                  synopsis       0.00      0.00      0.00         3
+                  thankyou       0.00      0.00      0.00         2
+                   trailer       1.00      0.17      0.29         6
+                    writer       0.00      0.00      0.00         2
+
+               avg / total       0.71      0.75      0.72      1120
+
+
+2018-06-23 18:54:02 INFO     __main__  - Entity evaluation results:
+2018-06-23 18:54:02 INFO     __main__  - Evaluation for entity extractor: ner_crf
+2018-06-23 18:54:02 INFO     __main__  - F1-Score:  0.9229221651004375
+2018-06-23 18:54:02 INFO     __main__  - Precision: 0.9218994240820055
+2018-06-23 18:54:02 INFO     __main__  - Accuracy:  0.9268359643102265
+2018-06-23 18:54:02 INFO     __main__  - Classification report:
+                      precision    recall  f1-score   support
+
+          actor_name       0.86      0.75      0.80       157
+   actor_nationality       1.00      1.00      1.00         1
+          actor_type       1.00      1.00      1.00         2
+      award_category       0.00      0.00      0.00         5
+      award_ceremony       0.78      0.88      0.82         8
+      character_name       1.00      0.43      0.60        21
+        country_name       0.62      0.71      0.66        66
+       director_name       0.70      0.64      0.67       156
+director_nationality       0.00      0.00      0.00         1
+         movie_genre       1.00      0.68      0.81        41
+ movie_gross_revenue       0.47      0.40      0.43        20
+      movie_language       0.77      0.64      0.70        72
+      movie_location       0.00      0.00      0.00        11
+          movie_name       0.92      0.86      0.89      1047
+  movie_release_date       0.89      0.70      0.78        67
+movie_release_region       0.00      0.00      0.00         6
+   movie_star_rating       1.00      0.50      0.67         2
+       movie_subject       0.88      0.71      0.79        59
+          movie_type       0.00      0.00      0.00         4
+           no_entity       0.95      0.99      0.97      5271
+         person_name       0.65      0.69      0.67        68
+       producer_name       0.78      0.63      0.70       129
+         rating_name       0.95      0.89      0.92        71
+
+         avg / total       0.92      0.93      0.92      7285
+
+
+
+
+2018-06-23 19:20:20 INFO     __main__  - CV evaluation (n=5)
+
+
+2018-06-23 19:20:20 INFO     __main__  - Intent evaluation results
+
+2018-06-23 19:20:20 INFO     __main__  - train F1-score: 0.930 (0.006)
+2018-06-23 19:20:20 INFO     __main__  - train Precision: 0.934 (0.006)
+2018-06-23 19:20:20 INFO     __main__  - train Accuracy: 0.941 (0.005)
+
+2018-06-23 19:20:20 INFO     __main__  - test F1-score: 0.765 (0.007)
+2018-06-23 19:20:20 INFO     __main__  - test Precision: 0.760 (0.011)
+2018-06-23 19:20:20 INFO     __main__  - test Accuracy: 0.790 (0.009)
+
+
+2018-06-23 19:20:20 INFO     __main__  - Entity evaluation results
+2018-06-23 19:20:20 INFO     __main__  - Entity extractor: ner_crf
+
+2018-06-23 19:20:20 INFO     __main__  - train F1-score: 0.962 (0.002)
+2018-06-23 19:20:20 INFO     __main__  - train Precision: 0.962 (0.002)
+2018-06-23 19:20:20 INFO     __main__  - train Accuracy: 0.964 (0.002)
+
+2018-06-23 19:20:20 INFO     __main__  - Entity extractor: ner_crf
+
+2018-06-23 19:20:20 INFO     __main__  - test F1-score: 0.930 (0.005)
+2018-06-23 19:20:20 INFO     __main__  - test Precision: 0.931 (0.004)
+2018-06-23 19:20:20 INFO     __main__  - test Accuracy: 0.934 (0.005)
+2018-06-23 19:20:20 INFO     __main__  - Finished evaluation

@@ -1,0 +1,13 @@
+['actor' 'actor_name' 'actor_name character' 'affirm'
+ 'award_category_count' 'award_count' 'birth_date' 'budget' 'company'
+ 'country' 'deny' 'description' 'director' 'director movie date rating'
+ 'director movie_name' 'director producer' 'director_name' 'genre'
+ 'goodbye' 'greet' 'language' 'media' 'movie' 'movie actor'
+ 'movie actor_name' 'movie budget' 'movie director' 'movie genre'
+ 'movie language' 'movie media' 'movie producer' 'movie rating'
+ 'movie release_date' 'movie review' 'movie subjects' 'movie_count'
+ 'movie_name' 'movie_other' 'organization' 'other' 'person' 'person_name'
+ 'picture' 'producer' 'producer picture' 'producer_count' 'rating'
+ 'rating rating' 'release_date' 'revenue' 'review' 'review movie'
+ 'review rating' 'runtime' 'subjects' 'synopsis' 'thankyou' 'trailer'
+ 'writer']

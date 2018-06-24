@@ -72,6 +72,7 @@ The functionality of the bot is separated across the following python modules:
     -  **ActionAnswer** - it is in charge of siplaying the answer to the user or saying that no answer was found
     -  **ActionFalloutSlots** - this is a special action that implements a *forgetting mechanism* that helps the bot funcion properly in longer conversations (4 or more turns). For more information on this action see the [report](https://github.com/tupini07/Movie-QA-Bot/blob/master/report/report.pdf).
 - `policy.py` - this contains the main dialogue policy for the bot. It is in charge of routing a user request to the appropiate action (ie, user wants to know the director of a movie so the policy gives the request to `ActionSearchPerson`)
+- `evaluate_nlu.py` - this is a modified version of Rasa's own [evaluate_nlu](https://github.com/RasaHQ/rasa_nlu/blob/ed00590df2e72a7fceec07aeb67aa12bfb13ad42/rasa_nlu/evaluate.py) script. The only difference between this and Rasa's own script is that it saves evaluation information into files so that they can be used later.
 
 
 # Data utilities
