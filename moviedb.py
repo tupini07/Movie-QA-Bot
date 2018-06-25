@@ -42,13 +42,13 @@ def _build_basic_query_where(slots):
 
         query = " where " + query[:-4]  # remove the last "and"
 
-    return query
+    return query 
 
 
 def make_search_on_slots(slots, column="*", extra_where="", order_by="year"):
     c = conn.cursor()
 
-    basic_where = _build_basic_query_where(slots)
+    basic_where = _build_basic_query_where(slots) 
 
     if basic_where == "" and extra_where != "":
         basic_where = " where "
