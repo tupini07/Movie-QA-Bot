@@ -196,6 +196,17 @@ class ActionSearchMovieInfo(Action):
         latest_intent = tracker.latest_message.intent["name"]
         matches = ""
 
+        # basically, just remove every other slot from the search
+        # we can only suppose that this is the intent of the user if move_name was given in the
+        # last message or in the preious one (so, if provided in last message or in memory)
+        last_and_current_slots = [k["entity"] for k in tracker.latest_message.entities] + \
+            list(ActionFalloutSlots._memory.keys())
+
+        if "movie_name" in last_and_current_slots:
+            for uneeded_slot in [k_s for k_s in slots.keys() if k_s != "movie_name"]:
+                slots.pop(uneeded_slot, None)
+
+
         def kws_in_latest_intent(*kws):
             is_in = [x in latest_intent for x in kws]
             return any(is_in)
