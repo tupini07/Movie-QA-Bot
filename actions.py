@@ -233,7 +233,7 @@ class ActionSearchMovieInfo(Action):
                     matches = f"It was released in the year {matches}"
 
                 elif kws_in_latest_intent("budget"):
-                    matches = f"It had a budger of ${matches}"
+                    matches = f"It had a budget of ${matches}"
 
                 elif kws_in_latest_intent("language"):
                     matches = f"It was originally made in {matches}"

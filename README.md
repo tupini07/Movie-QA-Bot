@@ -5,6 +5,8 @@ This is a bot that answers questions about movies either via text or via voice (
 
 A video demo of the bot "in action" can be seen [here](https://youtu.be/VY7iOqNmrtM)
 
+A shorter video demo of the voice interaction can be seen [here](https://www.youtube.com/watch?v=ZONcjcRzQLM&feature=youtu.be)
+
 This repository contains the code to run, build and evaluate the bot, and an accompaigning report that can be seen [here](https://github.com/tupini07/Movie-QA-Bot/blob/master/report/report.pdf).
 
 If you want to see an example conversation with the bot you can see the "[Example of an actual conversation with the bot](#example-of-an-actual-conversation-with-the-bot)" section later on in this readme. 
