@@ -6,13 +6,13 @@ This repository contains the code to run, build and evaluate the bot, and an acc
 
 If you want to see an example conversation with the bot you can see the "[Example of an actual conversation with the bot](#example-of-an-actual-conversation-with-the-bot)" section later on in this readme.
 
-# What kind ok questions can the bot answer?
+# What kind of questions can the bot answer?
 
 The bot can answer questions about the movie domain. All the topics it can answer are found in the [movie_domain.yml](https://github.com/tupini07/Movie-QA-Bot/blob/370d23441eeea3077dccbf46ba0e44a9fe4a1aa5/movie_domain.yml#L78) file, under *intents*, but basically it can answer this kind of queries:
 
 - Find actor/director of a movie or movies 
     - For example: all comedy movies, or movies published in 1990, made in a given country, etc
-- Find information on a given movie or movies. Basically it can answer question regarding with: *language, country, genre, budget, date, subjects (think about plot keywords), rating/reviews*, and *revenue*. Some examples:
+- Find information on a given movie or movies. Question regarding: *language, country, genre, budget, date, subjects (think about plot keywords), rating/reviews*, and *revenue*. Some examples:
     - *what is the gross revenue of movies published in Germany*
     - *when was Phantom Menace released*
     - *what genre is Star Wars*
@@ -34,7 +34,9 @@ The first thing you need to do to be able to run the bot is to install the depen
     - [SpeechRecognition](https://pypi.org/project/SpeechRecognition/)
     - [PyAudio](http://people.csail.mit.edu/hubert/pyaudio/)
 
-After these are installed (or only the first 2 if you don't care for the speech functionality) you can proceed to check out the [Makefile](https://github.com/tupini07/Movie-QA-Bot/blob/master/Makefile) which already defines a `help`  with the bot's capabilities and provides shortcuts to run all the commands. To just run the bot you need to first train the model with:
+After these are installed (or only the first 2 if you don't care for the speech functionality) you can proceed to check out the [Makefile](https://github.com/tupini07/Movie-QA-Bot/blob/master/Makefile) which already defines a `help` recipe that details the bot's capabilities. The Makefile also provides shortcuts to run all the commands. 
+
+To just run the bot you first need to train the model with:
 
 `make train-nlu-aggregated train-dialogue`
 
@@ -54,7 +56,7 @@ Here is a basic rundown of the "recipes" provided in the Makefile and what they 
 - `evaluate-nlu` -- only evaluate nlu against test data
 - `evaluate-nlu-crossval` -- do a crossvalidation on aggregated dataset
 - `evaluate-dialogue` -- only evaluate dialogue against test data
-- `train-and-evaluate` -- train nlu and dialogue and evaluate both
+- `train-and-evaluate` -- train nlu and dialogue and evaluate both on test data
 
 
 # Project Structure
@@ -69,7 +71,7 @@ The functionality of the bot is separated across the following python modules:
     -  **ActionSearchPersonInfo** - doesn't really do much since the database doens't hold "personal information" on actors and directors. For the moment it just redirects users to the "person's" IMDB page. It was intented as the action that could answer questions like "*who played Neo in The Matrix*"
     -  **ActionSearchMovie** - it is in charge of searching for a movie or set of movies that satisfy a given query (ie, comedy movies, or those made by a given director)
     -  **ActionSearchMovieInfo** - this is the largest action and is in charge of finding all the information related to a movie. It is in charge of answering questions like "*what genre is Star Wars*"
-    -  **ActionAnswer** - it is in charge of siplaying the answer to the user or saying that no answer was found
+    -  **ActionAnswer** - it is in charge of diplaying the answer to the user or saying that no answer was found
     -  **ActionFalloutSlots** - this is a special action that implements a *forgetting mechanism* that helps the bot funcion properly in longer conversations (4 or more turns). For more information on this action see the [report](https://github.com/tupini07/Movie-QA-Bot/blob/master/report/report.pdf).
 - `policy.py` - this contains the main dialogue policy for the bot. It is in charge of routing a user request to the appropiate action (ie, user wants to know the director of a movie so the policy gives the request to `ActionSearchPerson`)
 - `evaluate_nlu.py` - this is a modified version of Rasa's own [evaluate_nlu](https://github.com/RasaHQ/rasa_nlu/blob/ed00590df2e72a7fceec07aeb67aa12bfb13ad42/rasa_nlu/evaluate.py) script. The only difference between this and Rasa's own script is that it saves evaluation information into files so that they can be used later.
@@ -97,7 +99,7 @@ User: when was Phantom Menace released
 Bot: It was released in the year 1999
 
 User: who were the actors in The Matrix
-Bot: Marcus Chong, Gloria Foster, Nona Gaye, Steve Bastoni, Daniel Bernhardt, Keanu Reeves, Collin Chou, Essie Davis,  and Helmut Bakaitis
+Bot: Marcus Chong, Gloria Foster, Nona Gaye, Steve Bastoni, Daniel Bernhardt, Keanu Reeves, Collin Chou, Essie Davis, and Helmut Bakaitis
 
 User: when was it published
 Bot: There are multiple answers to your question: 
