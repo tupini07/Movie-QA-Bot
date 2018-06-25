@@ -124,6 +124,7 @@ class MoviePolicy(Policy):
         if tracker.latest_action_name == ACTION_LISTEN_NAME and \
                 last_intent in intent_action_map.keys() and \
                 tracker.latest_action_name not in list(intent_action_map.values()) + ["action_fallout_slots"]:
+                
             action = intent_action_map[last_intent]
             id_action = action_ids[action]
             return utils.one_hot(id_action, domain.num_actions)
@@ -133,6 +134,9 @@ class MoviePolicy(Policy):
         elif tracker.latest_action_name in intent_action_map.values():
             id_action = action_ids["action_answer"]
             return utils.one_hot(id_action, domain.num_actions)
+
+        elif tracker.latest_action_name == "action_answer":
+            return utils.one_hot(action_ids["action_fallout_slots"], domain.num_actions)
 
         else:  # we can't handle the current intent so just pass control to another policy
             return np.zeros(domain.num_actions)

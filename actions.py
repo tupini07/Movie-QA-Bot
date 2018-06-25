@@ -106,6 +106,7 @@ class ActionSearchPerson(Action):
             if len(data) == 1:  # if there is only one director then we save it the director slot
                 # in this way we can answer follow up questions regarding the director that the user may make
                 extra_slots.append(SlotSet("director_name", matches))
+                ActionFalloutSlots.add_slot_to_memory("director_name", matches) # we must also ensure to ta add director name to memory
 
         else:
             matches = []
@@ -330,6 +331,11 @@ class ActionFalloutSlots(Action):
     }
 
     @classmethod
+    def add_slot_to_memory(cls, slotname, slotvalue):
+        cls._memory[slotname] = {"value": slotvalue, "life": cls.LIFETIME + 1}
+
+
+    @classmethod
     def _countdown_memory(cls, tracker: DialogueStateTracker):
         """
         Decrease the "life" value of all memory units by one, and return a [ SlotSet() ]
@@ -363,7 +369,8 @@ class ActionFalloutSlots(Action):
         it will inmediatelly be decreased in the next line)
         """
         for k, v in new_entities.items():
-            cls._memory[k] = {"value": v, "life": cls.LIFETIME + 1}
+            cls.add_slot_to_memory(k, v)
+
 
     def name(self):
         return "action_fallout_slots"
