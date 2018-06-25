@@ -1,10 +1,13 @@
 # Movie-QA Bot
+### Final Project of the [Language Understanding System Course](http://disi.unitn.it/~riccardi/page7/page13/page13.html) @ University of Trento (2017/2018)
 
 This is a bot that answers questions about movies either via text or via voice (or text input and voice output), it was developed as the second/final project of the *Language Understanding Systems* course at *UNITN*. 
 
+A demo video of the bot "in action" can be seen [here](https://youtu.be/VY7iOqNmrtM)
+
 This repository contains the code to run, build and evaluate the bot, and an accompaigning report that can be seen [here](https://github.com/tupini07/Movie-QA-Bot/blob/master/report/report.pdf).
 
-If you want to see an example conversation with the bot you can see the "[Example of an actual conversation with the bot](#example-of-an-actual-conversation-with-the-bot)" section later on in this readme. If you want to see a longer example you can also see the [demo video](https://youtu.be/VY7iOqNmrtM).
+If you want to see an example conversation with the bot you can see the "[Example of an actual conversation with the bot](#example-of-an-actual-conversation-with-the-bot)" section later on in this readme. 
 
 # What kind of questions can the bot answer?
 
