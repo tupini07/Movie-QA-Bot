@@ -3,9 +3,9 @@
 
 This is a bot that answers questions about movies either via text or via voice (or text input and voice output), it was developed as the second/final project of the *Language Understanding Systems* course at *UNITN*. 
 
-A video demo of the bot "in action" can be seen [here](https://youtu.be/VY7iOqNmrtM)
-
-A shorter video demo of the voice interaction can be seen [here](https://www.youtube.com/watch?v=ZONcjcRzQLM&feature=youtu.be)
+**Demos:**
+- A video demo of the bot "in action" using text input and voice output can be seen [here](https://youtu.be/VY7iOqNmrtM)
+- A shorter video demo of the voice interaction functionality can be seen [here](https://www.youtube.com/watch?v=ZONcjcRzQLM&feature=youtu.be)
 
 This repository contains the code to run, build and evaluate the bot, and an accompaigning report that can be seen [here](https://github.com/tupini07/Movie-QA-Bot/blob/master/report/report.pdf).
 
