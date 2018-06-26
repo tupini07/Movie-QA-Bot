@@ -363,7 +363,7 @@ class ActionFalloutSlots(Action):
                 # if last action was to answer some movie information and we have the movie
                 # name then it is possible that the user will still want to talk about the movie.
                 # so we extend movie_name entity life by one more turn
-                if cls._last_custom_action == "action_search_movie_info" and \
+                if (cls._last_custom_action == "action_search_movie_info" or cls._last_custom_action == "action_search_person") and \
                         k == "movie_name":
                     vd["life"] += 1
 
