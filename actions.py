@@ -65,6 +65,7 @@ class ActionSearchPerson(Action):
 
         slots = extract_non_empty_slots(tracker)
         latest_intent = tracker.latest_message.intent["name"]
+        last_entities = [k["entity"] for k in tracker.latest_message.entities]
 
         extra_slots = []
         if "director" in latest_intent:
@@ -74,7 +75,8 @@ class ActionSearchPerson(Action):
             # if we're searching for a director then we won't use the name
             slots.pop("director_name", None)
 
-            # if we're asked for a director and we have a movie name in our slot then very probably
+            # if we're asked for a director and we have a movie name in our slot and 
+            # we weren't provided any other slots last turn then very probably
             # we want to know the name of the director who directed "movie_name". So we can just go
             # ahead and delete the others. Because of ActionFalloutSlots we know that movie_name
             # has at most one turn of being in memory, so it's recent
@@ -82,12 +84,20 @@ class ActionSearchPerson(Action):
             # basically, just remove every other slot from the search
             # we can only suppose that this is the intent of the user if move_name was given in the
             # last message or in the preious one (so, if provided in last message or in memory)
-            last_and_current_slots = [k["entity"] for k in tracker.latest_message.entities] + \
-                list(ActionFalloutSlots._memory.keys())
 
-            if "movie_name" in last_and_current_slots:
-                for uneeded_slot in [k_s for k_s in slots.keys() if k_s != "movie_name"]:
-                    slots.pop(uneeded_slot, None)
+
+            if len(last_entities) > 0 and "movie_name" not in last_entities:
+                slots.pop("movie_name", None) # remove movie name from slots. It might be that user wants
+                                              # list of movies that correspond to a criteria, so we don't need movie_name
+
+            else:
+                last_and_current_slots =  last_entities + \
+                    list(ActionFalloutSlots._memory.keys())
+
+                if "movie_name" in last_and_current_slots:
+                    for uneeded_slot in [k_s for k_s in slots.keys() if k_s != "movie_name"]:
+                        slots.pop(uneeded_slot, None)
+
 
         else:
             column = "actors"
@@ -381,6 +391,11 @@ class ActionFalloutSlots(Action):
         """
         for k, v in new_entities.items():
             cls.add_slot_to_memory(k, v)
+        
+        # if no new entities were provided then we keep memory for one extra turn
+        if len(new_entities) == 0:
+            for k in cls._memory.keys():
+                cls._memory[k]["life"] += 1
 
 
     def name(self):
@@ -398,7 +413,6 @@ class ActionFalloutSlots(Action):
         to_remove = ActionFalloutSlots._countdown_memory(tracker)
 
         # for debugging
-        # print("-- last action: " + str(tracker.latest_action_name))
         # print("-- memory: " + str(ActionFalloutSlots._memory))
         # print("-- intent: " + str(tracker.latest_message.intent["name"]))
         # print("-- stuff to pop: " + str(to_remove))
