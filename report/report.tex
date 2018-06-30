@@ -26,6 +26,8 @@
 \usepackage{graphicx}
 \graphicspath{ {graphics/} }
 
+\usepackage[inline]{enumitem}
+
 \aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{***} %  Enter the acl Paper ID here
 
@@ -67,6 +69,8 @@
 \end{abstract} 
 
 \section{Introduction}
+	
+	This is the report for the final project of the \textit{Language Understanding System Course} \cite{lus-website} at University of Trento year  2017/2018. 
 	
 	The bot was built using the Rasa stack (a combination of rasa NLU  and rasa\_core) and it was trained on data provided for this project about the movie domain. We'll analyze a bit the data, define the NLU and dialogue modules and their respective components, and finally evaluate the performance of the NLU module and present some difficulties found during development and design of the bot.
 
@@ -164,29 +168,44 @@
 			
 			The core idea behind Rasa NLU is that of a pipeline. The pipeline is composed of different components, and when a new message is given to the NLU module, it passes through each component of the pipeline in a sequential manner. The components in the pipeline are each in charge of doing different things. For this bot, the \textit{spacy\_sklearn} "standard" pipeline is  used, which is one that is already defined in the library itself. 
 			
-			According to \cite{rasanichol} the components (in the order of processing) of the \textit{spacy\_sklearn} pipeline are:
+			According to \cite{rasanlu} the components (in the order of processing) of the \textit{spacy\_sklearn} pipeline are:
 			
 			\begin{description}
 				\item[1. nlp\_spacy] 
-				this component is in charge of initializing Spacy structures. It is the first component in the pipeline since all other components depend on it. 
+				this component is in charge of initializing Spacy structures. It is the first component in the pipeline since all other components depend on it. Possible parameters that can be passed to this component are: 
+				\begin{enumerate*}
+					\item \textit{model} -- says which Spacy language model to load (ie: \textit{en}, \textit{de}, \textit{en\_core\_web\_md}, etc). The value used for this parameter is \textit{en}.
+					\item \textit{case\_sensitive} -- when retrieving word vectors this parameters defines if word casing is relevant or not. The value used for this parameter is \textit{false}, since for us the case of a word has meaning (ie: it might be a name). 
+				\end{enumerate*}
 				
 				\item[2. tokenizer\_spacy] 
-				creates "tokens" from the words in the sentence by using Spacy. It basically consists of segmenting the sentence into words, symbols and punctuations. More information on Spacy's functionality, including the tokenization process, can be found in \cite{spacy-tokenization}.
+				creates "tokens" from the words in the sentence by using the Spacy language model loaded in the previous step. It basically consists of segmenting the sentence into words, symbols and punctuations. More information on Spacy's functionality, including the tokenization process, can be found in \cite{spacy-tokenization}.
 				
 				\item[3. intent\_entity\_featurizer\_regex] 
-				creates regex features by looking at the training data. These features will later be used by the \textit{ner\_crf} component for entity extraction.
+				creates regex features by looking at the regular expressions defined in the training data (if any). These features will later be used by the \textit{ner\_crf} component for entity extraction and by \textit{intent\_classifier\_sklearn} for intent classification.
 				
 				\item[4. intent\_featurizer\_spacy] 
-				creates features for intent classification using the spacy featurizer. It basically adds the spacy word vectors to the other text features.
+				creates features for intent classification using the spacy featurizer. It basically adds the spacy word vectors to the other text features (if any) of a sentence.
 				
 				\item[5. ner\_crf] 
-				uses conditional random fields to extract entities. This component makes use of features created in previous components and also creates some of its own features, mainly: POS tags, capitalization, and it also considers word order. The most likely set of tags is calculated and returned.
+				uses conditional random fields to extract entities. This component makes use of features created in previous components and also creates some of its own features, mainly: POS tags, capitalization, and it also considers word order. The most likely set of tags is calculated and returned. Possible parameters that can be passed to this component are: 
+				\begin{enumerate*}
+					\item \textit{features} -- we can define features for the current word, the previous one and the next one. The features used for the previous and next words are: \textit{the lowercase representation of the word}, \textit{if the word is a title}, and \textit{if word is uppercase}. For the current word the used features are: \textit{the lowercase representation of the word}, \textit{the word 'bias'}, \textit{the 2 and 5 last characters}, \textit{the first 2, 3 and 5 characters}, \textit{if word is uppercase}, \textit{if word is title}, \textit{if the word is a title}, and finally \textit{if the word is a digit}.
+					
+					\item \textit{BILOU\_flag} -- if we want to use BILOU tagging or not. The value used for this parameter is \textit{true}.
+					
+					\item \textit{max\_iterations} -- It specifies the maximum number of iterations for the optimization algorithm. The used value is \textit{50}.
+					
+					\item \textit{L1\_c} -- Specifies the L1 regularization coefficient. The used value is \textit{0.1}.
+					
+					\item \textit{L2\_c} -- Specifies the L2 regularization coefficient. The used value is \textit{0.1}.
+				\end{enumerate*}
 				
 				\item[6. ner\_synonyms] 	
-				Maps synonymous entity values to the same value. 
+				Maps synonymous entity values to the same value: If the training data contains defined synonyms then this component will ensure that the relevant detected entities are mapped to the same value.
 				
 				\item[7. intent\_classifier\_sklearn] 
-				employs a linear SVM that uses features extracted in previous components so as to define what is the \textit{intent} of a sentence.
+				employs an SVM that uses features extracted in previous components so as to define what is the \textit{intent} of a sentence. The SVM employs a \textit{linear kernel} and the optimal value for the \textit{C} parameter is found by doing a grid search on the following values: \textit{1, 2, 5, 10, 20, 100}.
 				
 			\end{description}
 			
