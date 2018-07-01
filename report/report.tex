@@ -175,7 +175,7 @@
 				this component is in charge of initializing Spacy structures. It is the first component in the pipeline since all other components depend on it. Possible parameters that can be passed to this component are: 
 				\begin{enumerate*}
 					\item \textit{model} -- says which Spacy language model to load (ie: \textit{en}, \textit{de}, \textit{en\_core\_web\_md}, etc). The value used for this parameter is \textit{en}.
-					\item \textit{case\_sensitive} -- when retrieving word vectors this parameters defines if word casing is relevant or not. The value used for this parameter is \textit{false}, since for us the case of a word has meaning (ie: it might be a name). 
+					\item \textit{case\_sensitive} -- when retrieving word vectors this parameters defines if word casing is relevant or not (in other words: if words with different casing should be considered as different words). The value used for this parameter is \textit{false}. 
 				\end{enumerate*}
 				
 				\item[2. tokenizer\_spacy] 
@@ -188,9 +188,9 @@
 				creates features for intent classification using the spacy featurizer. It basically adds the spacy word vectors to the other text features (if any) of a sentence.
 				
 				\item[5. ner\_crf] 
-				uses conditional random fields to extract entities. This component makes use of features created in previous components and also creates some of its own features, mainly: POS tags, capitalization, and it also considers word order. The most likely set of tags is calculated and returned. Possible parameters that can be passed to this component are: 
+				uses conditional random fields to extract entities. This component makes use of features created in previous components as well as features created by itself. The most likely set of tags is calculated and returned. Possible parameters that can be passed to this component are: 
 				\begin{enumerate*}
-					\item \textit{features} -- we can define features for the current word, the previous one and the next one. The features used for the previous and next words are: \textit{the lowercase representation of the word}, \textit{if the word is a title}, and \textit{if word is uppercase}. For the current word the used features are: \textit{the lowercase representation of the word}, \textit{the word 'bias'}, \textit{the 2 and 5 last characters}, \textit{the first 2, 3 and 5 characters}, \textit{if word is uppercase}, \textit{if word is title}, \textit{if the word is a title}, and finally \textit{if the word is a digit}.
+					\item \textit{features} -- we can define features for the current, previous and next word. The features used for the previous and next words are: \textit{the lowercase representation of the word}, \textit{if the word is a title}, and \textit{if word is uppercase}. For the current word the used features are: \textit{the lowercase representation of the word}, \textit{the word 'bias'}, \textit{the last 2 and 5 characters}, \textit{the first 2, 3 and 5 characters}, \textit{if word is uppercase}, \textit{if the word is a title}, and finally \textit{if the word is a digit}.
 					
 					\item \textit{BILOU\_flag} -- if we want to use BILOU tagging or not. The value used for this parameter is \textit{true}.
 					
@@ -209,7 +209,7 @@
 				
 			\end{description}
 			
-			Some of these components, like the \textit{entity} and \textit{intent} extractors, need to be trained so they can do their job correctly. This is done in the \textit{training phase}, in which we provide the NLU module with data and it automatically trains each component of the pipeline based on it.
+			Some of these components, like the \textit{entity} and \textit{intent} extractors, need to be trained so they can do their job correctly. This is done in the \textit{training phase}, in which we provide the NLU module with data and it automatically trains each component of the pipeline on it.
 
 
 	\subsection{Dialogue Module}
@@ -230,18 +230,18 @@
 				\item[entities] these are a list of all the entities we expect the NLU module to recognize.
 				\item[intents] these are all the intents we expect the NLU module to recognize.
 				\item[templates] these are simple, canned, phrases that our bot may utter as a response to a user's query.
-				\item[actions] a list of all the actions our bot is capable of doing. These may contain simple actions like uttering one of the \textit{templates} or custom actions.
+				\item[actions] list of all the actions our bot is capable of doing. These may contain simple actions like uttering one of the \textit{templates} or, more complex, custom actions.
 			\end{description}
 			
 			In the dialogue module we also define how the user interacts with the bot, specifically what are the \textit{channels of communication}. For our bot, the user can interact with it either via text (like a normal chat) or via voice. The implementation of the voice communication channel is discussed more in depth in section \ref{sec-speech}.
 			
-			Besides the domain file and the channel configuration, the dialogue module is also optionally composed of one or more \textit{Policies} and one or more \textit{Custom Actions}. For this bot, we've defined one custom policy and some custom actions. 
+			Besides the domain file and the channel configuration, the dialogue module is also optionally composed of one or more \textit{Policies} and one or more \textit{Custom Actions}. For this bot, we've defined only one custom policy and some custom actions. 
 			
 
 		\subsubsection{Custom Actions}
 		\label{ssec-custom-actions}	
 			
-			This bot makes use of some custom actions, specifically actions that handle answering questions on the movie domain. The list of custom actions and a brief definition is the following:
+			This bot makes use of some custom actions, specifically actions that handle answering questions on the movie domain. The list of custom actions and a brief description of each is the following:
 			
 			\begin{description}
 				\item[ActionSearchPerson] 
@@ -272,9 +272,13 @@
 			
 			The policies are one of the most important parts of a bot. They are what decide, given a user input already \textit{translated} by the NLU module, which action of the bot should be done next so as to handle the user's utterance in the best way possible. In a high-level view, policies receive a user utterance from the NLU module and return one probability for each possible action, which says how likely is it that the bot will execute said action next.
 			
-			For this bot, a conjunction or Rasa's own \textit{MemoizationPolicy} and \textit{KerasPolicy} together with a custom policy was used. Both the meimoization and keras policies are trained on a dataset of example conversations, in this way they learn to predict which is the action that should be done next. Both of these are used to handle "non-custom" actions (like greet, say goodbye, etc), while the custom policy is in charge of routing requests that need special treatment to the respective actions. More information on the Keras and Memoization policies can be found in \cite{rasacore}.
+			For this bot, a conjunction or Rasa's own \textit{MemoizationPolicy} and \textit{KerasPolicy} together with a custom policy was used. Both the meimoization and keras policies are trained on a dataset of example conversations, in this way they learn to predict which is the action that should be done next. Both of these are used to handle "non-custom" actions (like greet, say goodbye, etc), while the custom policy is in charge of routing requests that need special treatment to the respective actions. 
 			
 			The custom policy takes in a request and the intent that the NLU module has assigned to it. If the intent is one that can be handled by one of the custom actions (ie, search for a movie, or information on a movie) then the corresponding action is selected as the one to be executed next. If the intent of the current request is not one that can be handled by the actions then this policy doesn't apport anything and lets the \textit{MemoizationPolicy} and \textit{KerasPolicy} decide what should be the next action.
+			
+			The KerasPolicy is an \textit{recurrent neural network} built with Keras \cite{keras}. The first layer is composed of an \textit{LSTM} with \textit{32} units followed by a \textit{fully connected} layer with a \textit{softmax} activation to actually get the probabilities of the possible actions. This model is given a list of the past actions and states, as well as the current state, to predict which should be the next action.
+			
+			The MemoizationPolicy remembers examples from the training data, if it encounters a situation that is the same as one in the training data then the next action chosen is the \textit{next} action we had in the respective training example. In our case we're limiting this \textit{remembering} to \textit{2} turns (this configuration is passed on to the the policy via the \textit{max\_history} parameter).
 		
 		
 		\subsubsection{Forgetting}
